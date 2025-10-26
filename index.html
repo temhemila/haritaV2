@@ -237,10 +237,6 @@
 
 <div id="button-container">
     <button id="btn-prev">←</button>
-    <button data-map-index="1" id="btn-map-1">1</button>
-    <button data-map-index="2" id="btn-map-2">2</button>
-    <button data-map-index="3" id="btn-map-3">3</button>
-    <button data-map-index="4" id="btn-map-4">4</button>
     <button id="btn-next">→</button>
 </div>
 
@@ -265,37 +261,57 @@
         maxBoundsViscosity: 1.0
     });
 
-    // 0: Kıta, 1-4: Toshokan Tarihi
+    // GÜNCELLENDİ: 0: Kıta, 1-15: Toshokan Tarihi (.webp formatında)
     var mapImages = [
-        'resimler/Harita.png',      // index 0
-        'resimler/THarita1.png', // index 1
-        'resimler/THarita2.png', // index 2
-        'resimler/THarita3.png', // index 3
-        'resimler/THarita4.png'  // index 4
+        'resimler/Harita.webp',     // index 0
+        'resimler/THarita1.webp',   // index 1
+        'resimler/THarita2.webp',   // index 2
+        'resimler/THarita3.webp',   // index 3
+        'resimler/THarita4.webp',   // index 4
+        'resimler/THarita5.webp',   // index 5
+        'resimler/THarita6.webp',   // index 6
+        'resimler/THarita7.webp',   // index 7
+        'resimler/THarita8.webp',   // index 8
+        'resimler/THarita9.webp',   // index 9
+        'resimler/THarita10.webp',  // index 10
+        'resimler/THarita11.webp',  // index 11
+        'resimler/THarita12.webp',  // index 12
+        'resimler/THarita13.webp',  // index 13
+        'resimler/THarita14.webp',  // index 14
+        'resimler/THarita15.webp'   // index 15
     ];
     
     // Aftzaak haritası için ayrı bir katman
     var aftzaakMapLayer = L.imageOverlay('resimler/KSehri.png', aftzaakBounds);
 
+    // GÜNCELLENDİ: Açıklamalar 15 haritaya çıkarıldı (Japonca çeviriler eklendi)
     var mapDescriptions = [
         "Standart coğrafya haritası. Bu, dünyanın günümüzdeki genel görünümüdür.", // Harita 0
-        "Hikâyenin geçtiği yer, dumanlar içindeki bu dünyadır. Büyüklüğü Almanya kadardır.", // Harita 1
-        "Şu anda tamamen dumanın altında kalmış durumdadır.", // Harita 2
-        "Hikâyenin geçtiği yerin batısında, büyük kulak memelerine sahip bir halk olan Tana kabilesinin (Tana soyunun) yurdu bulunur. Burada kıtanın altın çağını kurmuşlardır.", // Harita 3
-        "Görkemli (en parlak) dönemlerindeki toprakları / en geniş sınırları." // Harita 4
+        "Hikâyenin geçtiği yer, dumanlar içindeki bu dünyadır. Büyüklüğü Almanya kadardır.", // Harita 1 (Japonca 1)
+        "Şu anda tamamen dumanın altında kalmış durumdadır.", // Harita 2 (Japonca 2)
+        "Hikâyenin geçtiği yerin batısında, Tana soyunun (büyük kulak memeli halk) yurdu bulunur. Burada kıtanın altın çağını kurmuşlardır.", // Harita 3 (Japonca 3)
+        "Görkemli (en parlak) dönemlerindeki toprakları / en geniş sınırları.", // Harita 4 (Japonca 4)
+        "Günümüzde (bu bölge) genel olarak ince bir duman tabakasıyla kaplıdır.", // Harita 5 (Japonca 5)
+        "Hikâyenin geçtiği yerin kuzeyinde Omeka soyunun (boynuzlu halk) yurdu bulunur. Bir zamanlar burada, kıta tarihinin en geniş topraklarına sahip olan Maskeli İmparatorluk hüküm sürmüştür.", // Harita 6 (Japonca 6)
+        "Günümüzde hâlâ görece güvende!", // Harita 7 (Japonca 7)
+        "Kıtanın büyük bir bölümünü kaplayan Büyük Çöl'dür. Yaşamın kuruduğu bu toprakların, kadim Ejderha Savaşı'nın son muharebesine sahne olduğu sölenir. Sol kenardaki büyük nehrin yakınında Istayub soyu (esmer tenli halk) bir medeniyet kurmuştur.", // Harita 8 (Japonca 8)
+        "Kıtayı boydan boya geçen büyük nehrin, bir zamanlar ayrı olan kara parçalarının tektonik hareketlerle birleştiği yerdeki 'dikiş izi' olabileceği söylenmektedir.", // Harita 9 (Japonca 9)
+        "Hikâyenin geçtiği yerin güneydoğusundaki subtropikal bölgede Hopi soyunun (uzun kulaklı halk) yurdu bulunur. Bu topraklarda, kanunnamelerle yönetilen en eski krallık kurulmuştur.", // Harita 10 (Japonca 10)
+        "Gnaan'ın bu civarda bir yerde olduğu söylenir. Gerçekten var olup olmadığını bilmiyorum.", // Harita 11 (Japonca 11)
+        "Hikâyenin geçtiği yerin güneyinde Kayuga soyunun (üst kulaklı halk) yurdu bulunur. Bu bölgede birçok halk, Gnaan adındaki efsanevi topraklar için savaşmaya devam ediyordu.", // Harita 12 (Japonca 12)
+        "Hikâyenin geçtiği yerin doğusundaki kanyon bölgesinde Kokopa soyunun (kanatlı halk) yurdu bulunur. Bu bölgenin coğrafyası o kadar çetindir ki, kanatları olmayan halkların burada yaşaması mümkün değildir.", // Harita 13 (Japonca 13)
+        "Görünüşe göre duman felaketinden pek etkilenmemiş. Dumanla çevrelenmelerinin üzerinden 100 yıl geçti; acaba yeni ülkeler mi doğdu, yoksa hiçbir şey değişmedi mi...?", // Harita 14 (Japonca 14)
+        "Hikâyenin geçtiği yerin çok doğusunda tropik bir bölge bulunur. Burada, medeniyet kurmamış birçok azınlık halk, avcılık merkezli bir yaşam sürmekteydi. Araya Büyük Çöl girdiğinden, denizci halklar dışında kimseyle bir etkileşimleri olmamış gibi görünüyor." // Harita 15 (Japonca 15)
     ];
     
+    // GÜNCELLENDİ: Sadece Ana Harita başlığına ihtiyaç var
     var mapTitles = [
-        "Ana Harita",
-        "Toshokan Medeniyetleri (1)",
-        "Toshokan Medeniyetleri (2)",
-        "Toshokan Medeniyetleri (3)",
-        "Toshokan Medeniyetleri (4)"
+        "Ana Harita"
     ];
     
     var mapLayers = [];
     var currentActiveMap = null;
-    var currentTarihIndex = 1; // Toshokan Tarihi haritaları 1-4 arası
+    var currentTarihIndex = 1; // Toshokan Tarihi haritaları 1-15 arası
     
     // Aktif katman kontrol panelini (sağ panel) tutmak için değişken
     var currentLayerControl = null;
@@ -364,6 +380,7 @@
     // --- FONKSİYONLAR ---
 
     // ANA HARİTA DEĞİŞTİRME FONKSİYONU
+    // GÜNCELLENDİ: Tarih modu için başlıkları gizle/göster mantığı eklendi
     function switchMap(index) {
         var newLayer = mapLayers[index];
         
@@ -381,14 +398,16 @@
 
         // Harita sınırlarını ve merkezini Kıta/Tarih için ayarla
         map.setMaxBounds(kıtaBounds);
-        // Sadece ana kıta haritasına (index 0) dönerken merkezi sıfırla
-        if (index === 0) {
-            map.setView([kıtaHeight / 2, kıtaWidth / 2], -1.25);
-        }
         
-        // Sadece Toshokan Tarihi haritaları (index 1-4) için bilgi kutusunu güncelle
-        if (index > 0) {
-            infoTitle.textContent = mapTitles[index];
+        if (index === 0) {
+            // Ana kıta haritası (index 0)
+            map.setView([kıtaHeight / 2, kıtaWidth / 2], -1.25);
+            // Bilgi kutusunu ana harita bilgileriyle doldur (ancak gizli olabilir)
+            infoTitle.textContent = mapTitles[0]; // Sadece 1 başlık var
+            infoText.textContent = mapDescriptions[0];
+        } else {
+            // Toshokan Tarihi haritaları (index 1-15)
+            // Bilgi kutusunu güncelle (başlık gizlenecek)
             infoText.textContent = mapDescriptions[index];
             currentTarihIndex = index; // İndeksi de güncelle
         }
@@ -449,6 +468,7 @@
     // --- OLAY DİNLEYİCİLERİ (EVENT LISTENERS) ---
 
     // 1. SOL PANEL (HARİTA MODU) DİNLEYİCİSİ
+    // GÜNCELLENDİ: Tarih modunda başlığı gizle, diğerlerinde göster
     document.getElementById('left-panel').addEventListener('change', function(e) {
         if (e.target.name === 'map-mode') {
             
@@ -466,6 +486,7 @@
                     // Arayüzü ayarla
                     buttonContainer.style.display = 'none';
                     mapInfoContainer.style.display = 'none';
+                    infoTitle.style.display = 'block'; // Başlığı sıfırla (göster)
                     
                     // Kıta konumlarını varsayılan olarak ekle
                     locationsLayer.addTo(map);
@@ -477,6 +498,7 @@
                     // Arayüzü ayarla
                     buttonContainer.style.display = 'block';
                     mapInfoContainer.style.display = 'block';
+                    infoTitle.style.display = 'none'; // Başlığı GİZLE
                     break;
                     
                 case 'aftzaak':
@@ -485,6 +507,7 @@
                     // Arayüzü ayarla
                     buttonContainer.style.display = 'none';
                     mapInfoContainer.style.display = 'none';
+                    infoTitle.style.display = 'block'; // Başlığı sıfırla (göster)
                     
                     // Aftzaak konumlarını varsayılan olarak ekle
                     aftzaakLocationsLayer.addTo(map);
@@ -494,10 +517,11 @@
     });
 
     // 2. ALT BUTON (TOSHOKAN TARİHİ) DİNLEYİCİSİ
+    // GÜNCELLENDİ: Döngü 4 yerine 15 harita üzerinden yapılıyor
     buttonContainer.addEventListener('click', function(e) {
         var target = e.target;
         
-        // 1, 2, 3, 4 butonları
+        // Numaralı butonlar kaldırıldığı için bu blok artık tetiklenmeyecek
         if (target.tagName === 'BUTTON' && target.dataset.mapIndex) {
             var index = parseInt(target.dataset.mapIndex, 10);
             switchMap(index);
@@ -507,7 +531,7 @@
         if (target.id === 'btn-prev') {
             var newIndex = currentTarihIndex - 1;
             if (newIndex < 1) {
-                newIndex = 4; // 1'den 4'e döngü yap
+                newIndex = 15; // 1'den 15'e döngü yap
             }
             switchMap(newIndex);
         }
@@ -515,8 +539,8 @@
         // Sonraki (→) butonu
         if (target.id === 'btn-next') {
             var newIndex = currentTarihIndex + 1;
-            if (newIndex > 4) {
-                newIndex = 1; // 4'ten 1'e döngü yap
+            if (newIndex > 15) {
+                newIndex = 1; // 15'ten 1'e döngü yap
             }
             switchMap(newIndex);
         }
@@ -524,7 +548,6 @@
     
     
     // --- BAŞLANGIÇ AYARLARI ---
-    // Sayfa yüklendiğinde varsayılan (Kıta) durumunu ayarla
     function initializeMapState() {
         // Başlangıçta 'kıta' modu için sağ paneli oluştur
         updateLayerControl('kıta');
