@@ -26,12 +26,6 @@
             background-color: #333;
         }
 
-        /* --- YENİ: DIV ICON CSS (POPUP BÜYÜMESİNİ ENGELLER) --- */
-        .custom-div-icon {
-            background: none;
-            border: none;
-        }
-
         /* --- POPUP CSS --- */
         .custom-popup .leaflet-popup-content-wrapper {
             background: #f9f9f9;
@@ -209,10 +203,10 @@
                 line-height: 1.3;
             }
 
-            /* 5. Popup'ları daha duyarlı yap (BOYUT KÜÇÜLTÜLDÜ) */
+            /* 5. Popup'ları daha duyarlı yap */
             .custom-popup .leaflet-popup-content {
                 width: auto; /* Sabit 250px'i kaldır */
-                max-width: 250px; /* 80vw'den 250px'e düşürüldü */
+                max-width: 80vw; /* Ekran genişliğinin en fazla %80'i */
                 margin: 12px;
             }
         }
@@ -222,16 +216,6 @@
 <body>
 
 <div id="map"></div>
-
-<div style="display:none; width:0; height:0; overflow:hidden;">
-    <img src="resimler/Hydiah.png">
-    <img src="resimler/SAHarita.png">
-    <img src="resimler/Lobin.png">
-    <img src="resimler/Yokt.png">
-    <img src="resimler/Kansinaek.png">
-    <img src="resimler/Aftzaanka.png">
-    <img src="resimler/Tohne.png">
-</div>
 
 <div id="left-panel">
     <h4>Harita Modu</h4>
@@ -283,7 +267,7 @@
 
     // 0: Kıta, 1-4: Toshokan Tarihi
     var mapImages = [
-        'resimler/Harita.png',     // index 0
+        'resimler/Harita.png',      // index 0
         'resimler/THarita1.png', // index 1
         'resimler/THarita2.png', // index 2
         'resimler/THarita3.png', // index 3
@@ -338,14 +322,11 @@
     // Başlangıç view'ı kıta boyutlarına göre ayarlandı
     map.setView([kıtaHeight / 2, kıtaWidth / 2], -1.25);
 
-    // --- DEĞİŞİKLİK: L.icon -> L.divIcon ---
-    // Bu, zoom yapıldığında ikonun ve popup'ın büyümesini engeller.
-    var Isaret = L.divIcon({
-        className: 'custom-div-icon', // CSS için özel bir sınıf
-        html: "<img src='resimler/Isaret2.png' style='width:48px; height:48px;'>", // İkonu HTML olarak ekliyoruz
-        iconSize: [48, 48],      // Boyut (ekran pikseli)
-        iconAnchor: [24, 48],    // Çapa (aynı)
-        popupAnchor: [0, -32]   // Popup çapası (aynı)
+    var Isaret = L.icon({
+        iconUrl: 'resimler/Isaret2.png',
+        iconSize: [48, 48],
+        iconAnchor: [24, 48],
+        popupAnchor: [0, -32]
     });
 
     // --- KATMAN 1: KITA HARİTASI KONUMLARI ---
