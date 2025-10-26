@@ -244,14 +244,39 @@
 <script>
     // --- HARİTA GÖRSELLERİ VE BİLGİLERİ ---
     
-    // Ayrı harita boyutları tanımlandı
+    // Kıta Haritası boyutları (Standart 2048x2048)
     var kıtaWidth = 2048;
     var kıtaHeight = 2048;
     var kıtaBounds = [[0, 0], [kıtaHeight, kıtaWidth]]; // [[0, 0], [2048, 2048]]
 
+    // Aftzaak Haritası boyutları
     var aftzaakWidth = 1696;
     var aftzaakHeight = 2048;
     var aftzaakBounds = [[0, 0], [aftzaakHeight, aftzaakWidth]]; // [[0, 0], [2048, 1696]]
+    
+    // YENİ: Her bir Tarih Haritasının boyutları (Height x Width)
+    // Leaflet'te sınırlar [[y_min, x_min], [y_max, x_max]] şeklindedir, burada y=height, x=width
+    var tarihDimensions = [
+        [0, 0], // index 0 (Kıta) için placeholder, kullanılmayacak
+        [1538, 1398], // THarita1: 1398x1538 -> [1538, 1398]
+        [1848, 1350], // THarita2: 1350x1848 -> [1848, 1350]
+        [1746, 1204], // THarita3: 1204x1746 -> [1746, 1204]
+        [1986, 1166], // THarita4: 1166x1986 -> [1986, 1166]
+        [1710, 1404], // THarita5: 1404x1710 -> [1710, 1404]
+        [1652, 1426], // THarita6: 1426x1652 -> [1652, 1426]
+        [1342, 1456], // THarita7: 1456x1342 -> [1342, 1456]
+        [1358, 1458], // THarita8: 1458x1358 -> [1358, 1458]
+        [1200, 1163], // THarita9: 1163x1200 -> [1200, 1163]
+        [1542, 1602], // THarita10: 1602x1542 -> [1542, 1602]
+        [1528, 1390], // THarita11: 1390x1528 -> [1528, 1390]
+        [1804, 1410], // THarita12: 1410x1804 -> [1804, 1410]
+        [1592, 1560], // THarita13: 1560x1592 -> [1592, 1560]
+        [1556, 1554], // THarita14: 1554x1556 -> [1556, 1554]
+        [1664, 1636]  // THarita15: 1636x1664 -> [1664, 1636]
+    ];
+    
+    // YENİ: Tarih Haritaları için özel sınırları içeren bir dizi oluştur
+    var tarihBounds = tarihDimensions.map(dims => [[0, 0], dims]);
 
 
     var map = L.map('map', {
@@ -261,7 +286,7 @@
         maxBoundsViscosity: 1.0
     });
 
-    // GÜNCELLENDİ: 0: Kıta, 1-15: Toshokan Tarihi (.webp formatında)
+    // GÜNCELLENDİ: Harita görselleri
     var mapImages = [
         'resimler/Harita.webp',     // index 0: Kıta Haritası
         'resimler/THarita1.webp',   // index 1: Tarih 1
@@ -284,38 +309,23 @@
     // Aftzaak haritası için ayrı bir katman
     var aftzaakMapLayer = L.imageOverlay('resimler/KSehri.png', aftzaakBounds);
 
-    // GÜNCELLENDİ ve DÜZELTİLDİ: Harita açıklamaları Japonca metne göre yeniden sıralandı ve çevrildi.
+    // Harita Açıklamaları (Aynı kaldı)
     var mapDescriptions = [
         "Standart coğrafya haritası. Bu, dünyanın günümüzdeki genel görünümüdür.", // Harita 0: Ana Harita
-        // Japonca 1
         "Hikâyenin geçtiği yer, dumanlar içindeki bu dünyadır. Büyüklüğü yaklaşık Almanya kadardır.", // Harita 1 (THarita1.webp)
-        // Japonca 2
         "Hikâyenin geçtiği yerin batısında, Tana soyunun (büyük kulak memeli halk) yurdu bulunur. Burada kıtanın altın çağını kurmuşlardır.", // Harita 2 (THarita2.webp)
-        // Japonca 3
         "Şu anda tamamen dumanın altında kalmış durumdadır.", // Harita 3 (THarita3.webp)
-        // Japonca 4
         "Hikâyenin geçtiği yerin kuzeyinde Omeka soyunun (boynuzlu halk) yurdu bulunur. Bir zamanlar burada, kıta tarihinin en geniş topraklarına sahip olan Maskeli İmparatorluk hüküm sürmüştür.", // Harita 4 (THarita4.webp)
-        // Japonca 5
         "Günümüzde (bu bölge) genel olarak ince bir duman tabakasıyla kaplıdır.", // Harita 5 (THarita5.webp)
-        // Japonca 6
         "Görkemli (en parlak) dönemlerindeki toprakları / en geniş sınırları.", // Harita 6 (THarita6.webp)
-        // Japonca 7
         "Kıtanın büyük bir bölümünü kaplayan Büyük Çöl'dür. Yaşamın kuruduğu bu toprakların, kadim Ejderha Savaşı'nın son muharebesine sahne olduğu sölenir. Sol kenardaki büyük nehrin yakınında Istayub soyu (esmer tenli halk) bir medeniyet kurmuştur.", // Harita 7 (THarita7.webp)
-        // Japonca 8
         "Günümüzde hâlâ görece güvende!", // Harita 8 (THarita8.webp)
-        // Japonca 9
         "Kıtayı boydan boya geçen büyük nehrin, bir zamanlar ayrı olan kara parçalarının tektonik hareketlerle birleştiği yerdeki 'dikiş izi' olabileceği söylenmektedir.", // Harita 9 (THarita9.webp)
-        // Japonca 10
         "Hikâyenin geçtiği yerin güneydoğusundaki subtropikal bölgede Hopi soyunun (uzun kulaklı halk) yurdu bulunur. Bu topraklarda, kanunnamelerle yönetilen en eski krallık kurulmuştur.", // Harita 10 (THarita10.webp)
-        // Japonca 11
         "Hikâyenin geçtiği yerin güneyinde Kayuga soyunun (üst kulaklı halk) yurdu bulunur. Bu bölgede birçok halk, Gnaan adındaki efsanevi topraklar için savaşmaya devam ediyordu.", // Harita 11 (THarita11.webp)
-        // Japonca 12
         "Gnaan'ın bu civarda bir yerde olduğu söylenir. Gerçekten var olup olmadığını bilmiyorum.", // Harita 12 (THarita12.webp)
-        // Japonca 13
         "Hikâyenin geçtiği yerin doğusundaki kanyon bölgesinde Kokopa soyunun (kanatlı halk) yurdu bulunur. Bu bölgenin coğrafyası o kadar çetindir ki, kanatları olmayan halkların burada yaşaması mümkün değildir.", // Harita 13 (THarita13.webp)
-        // Japonca 14
         "Hikâyenin geçtiği yerin çok doğusunda tropik bir bölge bulunur. Burada, medeniyet kurmamış birçok azınlık halk, avcılık merkezli bir yaşam sürmekteydi. Büyük Çöl'ü geçmek zor olduğundan, denizci halklar dışında kimseyle bir etkileşimleri olmamış gibi görünüyor.", // Harita 14 (THarita14.webp)
-        // Japonca 15
         "Görünüşe göre duman felaketinden pek etkilenmemiş. Dumanla çevrelenmelerinin üzerinden 100 yıl geçti; acaba yeni ülkeler mi doğdu, yoksa hiçbir şey değişmedi mi...?" // Harita 15 (THarita15.webp)
     ];
     
@@ -339,8 +349,15 @@
 
     // --- TÜM HARİTALARI ARKA PLANDA OLUŞTUR ---
     mapImages.forEach((url, index) => {
-        // Kıta ve Tarih haritaları 'kıtaBounds' kullanır
-        var layer = L.imageOverlay(url, kıtaBounds);
+        var bounds;
+        if (index === 0) {
+            bounds = kıtaBounds; // Kıta haritası
+        } else {
+            // YENİ: Tarih haritaları kendi özel sınırlarını kullanır
+            bounds = tarihBounds[index]; 
+        }
+        
+        var layer = L.imageOverlay(url, bounds);
         mapLayers.push(layer);
         
         if (index === 0) {
@@ -360,7 +377,7 @@
         popupAnchor: [0, -32]
     });
 
-    // --- KATMAN 1: KITA HARİTASI KONUMLARI ---
+    // --- KATMAN 1: KITA HARİTASI KONUMLARI (Aynı kaldı) ---
     var centerContent = "<h3>HYDİAH TOPRAKLARI</h3><p>Hydiah ırkından Istayu halkının yuvası olan bu bölge... <a href='...'>Devamı</a></p><img src='resimler/Hydiah.png' alt='...'>";
     var centerMarker = L.marker([1365, 458], {icon: Isaret}).bindPopup(centerContent, { className: 'custom-popup' });
     var kaleContent = "<h3>Sissiz Alan</h3><p>Acıpelin Gizmeni felaketi sonrası geriye kalan yaşanabilir bölge, boyutu günümüz Almanyası kadardır.</p><img src='resimler/SAHarita.png' alt='...'>"; 
@@ -374,18 +391,14 @@
     
     var locationsLayer = L.layerGroup([centerMarker, northWestLocation, lobinLocation, yoktLocation, karasinaekLocation]);
 
-    // --- KATMAN 2: SİS KATMANI (KITA HARİTASI İÇİN) ---
+    // --- KATMAN 2: SİS KATMANI (KITA HARİTASI İÇİN) (Aynı kaldı) ---
     var sisUrl = 'resimler/Bulutlar.png';
-    var sisBounds = [[0, 0], [kıtaHeight, kıtaWidth]]; // Bu da kıta boyutlarında
+    var sisBounds = [[0, 0], [kıtaHeight, kıtaWidth]]; 
     var sisLayer = L.imageOverlay(sisUrl, sisBounds, { opacity: 0.8, interactive: false });
     
-    // --- KATMAN 3: AFTZAAK KONUMLARI ---
-    
-    // *** DÜZELTME: Marker 1 (Saray) (PS Y: 1527 -> Leaflet Y: 2048 - 1527 = 521) ***
+    // --- KATMAN 3: AFTZAAK KONUMLARI (Aynı kaldı) ---
     var aftzaakContent1 = "<h3>Aftzaanka Sarayı</h3><p>Aftzaak'ın mevcut hükümdarları olan... <a href='#'>Devamı</a></p><img src='resimler/Aftzaanka.png' alt='Aftzaanka Sarayı'>";
     var aftzaakMarker1 = L.marker([521, 1405], {icon: Isaret}).bindPopup(aftzaakContent1, { className: 'custom-popup' });
-    
-    // *** DÜZELTME: Marker 2 (Enstitü) (PS Y: 1352 -> Leaflet Y: 2048 - 1352 = 696) ***
     var aftzaakContent2 = "<h3>TOHNE ENSTİTÜSÜ İKİNCİ KAMPÜSÜ</h3><p>Şehirdeki en seçkin alimlerin görev yaptığı... <a href='#'>Devamı</a></p><img src='resimler/Tohne.png' alt='Tohne Enstitüsü'>";
     var aftzaakMarker2 = L.marker([696, 299], {icon: Isaret}).bindPopup(aftzaakContent2, { className: 'custom-popup' });
     
@@ -395,9 +408,12 @@
     // --- FONKSİYONLAR ---
 
     // ANA HARİTA DEĞİŞTİRME FONKSİYONU
-    // GÜNCELLENDİ: Tarih modu için başlıkları gizle/göster mantığı eklendi
+    // GÜNCELLENDİ: Yeni haritanın boyutlarına ve merkezine göre harita view'ı ayarlanıyor.
     function switchMap(index) {
         var newLayer = mapLayers[index];
+        var boundsToUse = (index === 0) ? kıtaBounds : tarihBounds[index]; // 0 ise kıta, diğerleri kendi bounds'u
+        var heightToUse = boundsToUse[1][0];
+        var widthToUse = boundsToUse[1][1];
         
         if (newLayer === currentActiveMap) {
             return;
@@ -411,24 +427,23 @@
         newLayer.addTo(map);
         currentActiveMap = newLayer;
 
-        // Harita sınırlarını ve merkezini Kıta/Tarih için ayarla
-        map.setMaxBounds(kıtaBounds);
+        // Harita sınırlarını ve merkezini yeni katmanın boyutlarına göre ayarla
+        map.setMaxBounds(boundsToUse);
+        // Yeni haritanın boyutlarına göre merkezi ayarla
+        map.setView([heightToUse / 2, widthToUse / 2], -1.25);
         
         if (index === 0) {
             // Ana kıta haritası (index 0)
-            map.setView([kıtaHeight / 2, kıtaWidth / 2], -1.25);
-            // Bilgi kutusunu ana harita bilgileriyle doldur (ancak gizli olabilir)
-            infoTitle.textContent = mapTitles[0]; // Sadece 1 başlık var
+            infoTitle.textContent = mapTitles[0]; 
             infoText.textContent = mapDescriptions[0];
         } else {
             // Toshokan Tarihi haritaları (index 1-15)
-            // Bilgi kutusunu güncelle (başlık gizlenecek)
             infoText.textContent = mapDescriptions[index];
             currentTarihIndex = index; // İndeksi de güncelle
         }
     }
     
-    // AFTZAAK HARİTASINA GEÇİŞ FONKSİYONU
+    // AFTZAAK HARİTASINA GEÇİŞ FONKSİYONU (Aynı kaldı, ama kendi sınırlarını kullanıyor)
     function switchToAftzaak() {
         if (currentActiveMap === aftzaakMapLayer) {
             return;
@@ -447,14 +462,14 @@
         map.setView([aftzaakHeight / 2, aftzaakWidth / 2], -1.25);
     }
     
-    // Tüm overlay katmanlarını temizle
+    // Tüm overlay katmanlarını temizle (Aynı kaldı)
     function clearAllOverlays() {
         map.removeLayer(locationsLayer);
         map.removeLayer(sisLayer);
         map.removeLayer(aftzaakLocationsLayer);
     }
 
-    // Harita moduna göre sağdaki katman panelini güncelleyen fonksiyon
+    // Harita moduna göre sağdaki katman panelini güncelleyen fonksiyon (Aynı kaldı)
     function updateLayerControl(mode) {
         // 1. Varsa, mevcut katman kontrol panelini kaldır
         if (currentLayerControl) {
@@ -483,7 +498,6 @@
     // --- OLAY DİNLEYİCİLERİ (EVENT LISTENERS) ---
 
     // 1. SOL PANEL (HARİTA MODU) DİNLEYİCİSİ
-    // GÜNCELLENDİ: Tarih modunda başlığı gizle, diğerlerinde göster
     document.getElementById('left-panel').addEventListener('change', function(e) {
         if (e.target.name === 'map-mode') {
             
@@ -532,15 +546,8 @@
     });
 
     // 2. ALT BUTON (TOSHOKAN TARİHİ) DİNLEYİCİSİ
-    // GÜNCELLENDİ: Döngü 4 yerine 15 harita üzerinden yapılıyor
     buttonContainer.addEventListener('click', function(e) {
         var target = e.target;
-        
-        // Numaralı butonlar kaldırıldığı için bu blok artık tetiklenmeyecek
-        if (target.tagName === 'BUTTON' && target.dataset.mapIndex) {
-            var index = parseInt(target.dataset.mapIndex, 10);
-            switchMap(index);
-        }
         
         // Önceki (←) butonu
         if (target.id === 'btn-prev') {
