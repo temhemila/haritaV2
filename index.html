@@ -1,566 +1,582 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Toshokan</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""/>
-    
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""></script>
-      
-    <style>
-        /* ... Önceki CSS kodları (body, #map) ... */
-        body {
-            padding: 0;
-            margin: 0;
-        }
-        
-        #map { 
-            height: 100vh; 
-            width: 100%; 
-            background-color: #333;
-        }
+    <title>Toshokan</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""></script>
+      
+    <style>
+        /* ... Önceki CSS kodları (body, #map) ... */
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        
+        #map { 
+            height: 100vh; 
+            width: 100%; 
+            background-color: #333;
+        }
 
-        /* --- POPUP CSS --- */
-        .custom-popup .leaflet-popup-content-wrapper {
-            background: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        .custom-popup .leaflet-popup-content {
-            margin: 15px;
-            width: 250px; /* Masaüstü için sabit genişlik */
-        }
-        .custom-popup h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-        .custom-popup p {
-            margin: 5px 0 10px 0;
-            color: #555;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-        .custom-popup img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin-top: 5px;
-        }
+        /* --- POPUP CSS --- */
+        .custom-popup .leaflet-popup-content-wrapper {
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .custom-popup .leaflet-popup-content {
+            margin: 15px;
+            width: 250px; /* Masaüstü için sabit genişlik */
+        }
+        .custom-popup h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .custom-popup p {
+            margin: 5px 0 10px 0;
+            color: #555;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .custom-popup img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
 
-        /* --- TOSHOKAN TARİHİ BUTON KONTEYNERİ (ALT ORTA) --- */
-        #button-container {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            
-            /* Başlangıçta gizli */
-            display: none; 
-        }
+        /* --- TOSHOKAN TARİHİ BUTON KONTEYNERİ (ALT ORTA) --- */
+        #button-container {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            
+            /* Başlangıçta gizli */
+            display: none; 
+        }
 
-        #button-container button {
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 5px 10px;
-            cursor: pointer;
-            margin: 0 3px;
-            min-width: 30px; /* Ok butonları için */
-        }
-        #button-container button:hover {
-            background: #f4f4f4;
-        }
-        #button-container button:active {
-            background: #eee;
-        }
-        
-        /* --- HARİTA BİLGİ KUTUSU (SAĞ ALT) --- */
-        #map-info {
-            position: absolute;
-            bottom: 150px;
-            right: 10px; 
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.85); 
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            max-width: 300px;
-            font-family: sans-serif;
-            line-height: 1.4;
-            
-            /* Başlangıçta gizli */
-            display: none; 
-        }
+        #button-container button {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin: 0 3px;
+            min-width: 30px; /* Ok butonları için */
+        }
+        #button-container button:hover {
+            background: #f4f4f4;
+        }
+        #button-container button:active {
+            background: #eee;
+        }
+        
+        /* --- HARİTA BİLGİ KUTUSU (SAĞ ALT) --- */
+        #map-info {
+            position: absolute;
+            bottom: 150px;
+            right: 10px; 
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85); 
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            max-width: 300px;
+            font-family: sans-serif;
+            line-height: 1.4;
+            
+            /* Başlangıçta gizli */
+            display: none; 
+        }
 
-        #map-info h4 {
-            margin-top: 0;
-            margin-bottom: 5px;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        #map-info p {
-            margin: 0;
-            color: #555;
-            font-size: 14px;
-        }
-        
-        /* --- YENİ: SOL KONTROL PANELİ (HARİTA MODLARI) --- */
-        #left-panel {
-            position: absolute;
-            top: 80px; 
-            left: 10px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            font-family: sans-serif;
-        }
-        #left-panel h4 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        #left-panel label {
-            display: block;
-            margin-bottom: 5px;
-            cursor: pointer;
-        }
-        
-        /* Sağdaki katman kontrol panelini sola yanaştırıyoruz */
-        .leaflet-top.leaflet-right {
-            top: 170px; /* Sol panelin yüksekliğine göre ayarlayabilirsiniz */
-        }
-        
+        #map-info h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        #map-info p {
+            margin: 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        /* --- YENİ: SOL KONTROL PANELİ (HARİTA MODLARI) --- */
+        #left-panel {
+            position: absolute;
+            top: 80px; 
+            left: 10px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            font-family: sans-serif;
+        }
+        #left-panel h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        #left-panel label {
+            display: block;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        /* Sağdaki katman kontrol panelini sola yanaştırıyoruz */
+        .leaflet-top.leaflet-right {
+            top: 170px; /* Sol panelin yüksekliğine göre ayarlayabilirsiniz */
+        }
+        
 
-        /* --- MOBİL UYUMLULUK (MEDIA QUERY) --- */
-        /* Ekran 768px veya daha darsa bu kurallar geçerli olur */
-        @media (max-width: 768px) {
+        /* --- MOBİL UYUMLULUK (MEDIA QUERY) --- */
+        /* Ekran 768px veya daha darsa bu kurallar geçerli olur */
+        @media (max-width: 768px) {
 
-            /* 1. Sol Paneli (Mod Seçimi) küçültüp, yukarıya al */
-            #left-panel {
-                top: 10px; /* 80px'ten 10px'e */
-                left: 10px;
-                padding: 10px;
-                background: rgba(255, 255, 255, 0.9);
-            }
-            #left-panel h4 {
-                font-size: 14px;
-                margin-bottom: 5px;
-            }
-            #left-panel label {
-                font-size: 13px;
-            }
+            /* 1. Sol Paneli (Mod Seçimi) küçültüp, yukarıya al */
+            #left-panel {
+                top: 10px; /* 80px'ten 10px'e */
+                left: 10px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.9);
+            }
+            #left-panel h4 {
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+            #left-panel label {
+                font-size: 13px;
+            }
 
-            /* 2. Sağ Paneli (Katmanlar) yukarıya al */
-            .leaflet-top.leaflet-right {
-                top: 10px; /* 170px'ten 10px'e */
-            }
+            /* 2. Sağ Paneli (Katmanlar) yukarıya al */
+            .leaflet-top.leaflet-right {
+                top: 10px; /* 170px'ten 10px'e */
+            }
 
-            /* 3. Alt Buton Konteynerini (Tarih) en alta al */
-            #button-container {
-                bottom: 10px; /* 80px'ten 10px'e */
-                padding: 8px;
-                width: 90%; /* Ekranın %90'ını kaplasın */
-                box-sizing: border-box; 
-            }
-            #button-container button {
-                padding: 6px 8px;
-                font-size: 14px;
-                margin: 0 2px;
-            }
+            /* 3. Alt Buton Konteynerini (Tarih) en alta al */
+            #button-container {
+                bottom: 10px; /* 80px'ten 10px'e */
+                padding: 8px;
+                width: 90%; /* Ekranın %90'ını kaplasın */
+                box-sizing: border-box; 
+            }
+            #button-container button {
+                padding: 6px 8px;
+                font-size: 14px;
+                margin: 0 2px;
+            }
 
-            /* 4. Harita Bilgi Kutusunu (Tarih) butonların hemen üstüne al */
-            #map-info {
-                /* 150px'ten ~75px'e (buton yüksekliği + boşluk) */
-                bottom: 75px; 
-                right: 10px;
-                left: 10px; /* Sol ve sağa yasla */
-                width: auto; /* Otomatik genişlik */
-                max-width: none; /* max-width: 300px'ü kaldır */
-                padding: 10px;
-                background: rgba(255, 255, 255, 0.9);
-            }
-            #map-info h4 {
-                font-size: 14px;
-            }
-            #map-info p {
-                font-size: 13px;
-                line-height: 1.3;
-            }
+            /* 4. Harita Bilgi Kutusunu (Tarih) butonların hemen üstüne al */
+            #map-info {
+                /* 150px'ten ~75px'e (buton yüksekliği + boşluk) */
+                bottom: 75px; 
+                right: 10px;
+                left: 10px; /* Sol ve sağa yasla */
+                width: auto; /* Otomatik genişlik */
+                max-width: none; /* max-width: 300px'ü kaldır */
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.9);
+            }
+            #map-info h4 {
+                font-size: 14px;
+            }
+            #map-info p {
+                font-size: 13px;
+                line-height: 1.3;
+            }
 
-            /* 5. Popup'ları daha duyarlı yap */
-            .custom-popup .leaflet-popup-content {
-                width: auto; /* Sabit 250px'i kaldır */
-                max-width: 80vw; /* Ekran genişliğinin en fazla %80'i */
-                margin: 12px;
-            }
-        }
-        
-    </style>
+            /* 5. Popup'ları daha duyarlı yap */
+            .custom-popup .leaflet-popup-content {
+                width: auto; /* Sabit 250px'i kaldır */
+                max-width: 80vw; /* Ekran genişliğinin en fazla %80'i */
+                margin: 12px;
+            }
+        }
+        
+    </style>
 </head>
 <body>
 
 <div id="map"></div>
 
 <div id="left-panel">
-    <h4>Harita Modu</h4>
-    <label>
-        <input type="radio" name="map-mode" value="kıta" checked> Kıta haritası
-    </label>
-    <label>
-        <input type="radio" name="map-mode" value="tarih"> Toshokan tarihi
-    </label>
-    <label>
-        <input type="radio" name="map-mode" value="aftzaak"> Aftzaak
-    </label>
+    <h4>Harita Modu</h4>
+    <label>
+        <input type="radio" name="map-mode" value="kıta" checked> Kıta haritası
+    </label>
+    <label>
+        <input type="radio" name="map-mode" value="tarih"> Toshokan tarihi
+    </label>
+    <label>
+        <input type="radio" name="map-mode" value="aftzaak"> Aftzaak
+    </label>
 </div>
 
 <div id="map-info">
-    <h4 id="info-title">Harita Açıklaması</h4>
-    <p id="info-text">Aktif harita ile ilgili açıklamalar burada görüntülenecektir.</p>
+    <h4 id="info-title">Harita Açıklaması</h4>
+    <p id="info-text">Aktif harita ile ilgili açıklamalar burada görüntülenecektir.</p>
 </div>
 
 <div id="button-container">
-    <button id="btn-prev">←</button>
-    <button id="btn-next">→</button>
+    <button id="btn-prev">←</button>
+    <button id="btn-next">→</button>
 </div>
 
 
 <script>
-    // --- HARİTA GÖRSELLERİ VE BİLGİLERİ ---
-    
-    // Ayrı harita boyutları tanımlandı
-    var kıtaWidth = 2048;
-    var kıtaHeight = 2048;
-    var kıtaBounds = [[0, 0], [kıtaHeight, kıtaWidth]]; // [[0, 0], [2048, 2048]]
+    // --- HARİTA GÖRSELLERİ VE BİLGİLERİ ---
+    
+    // Ayrı harita boyutları tanımlandı
+    var kıtaWidth = 2048;
+    var kıtaHeight = 2048;
+    var kıtaBounds = [[0, 0], [kıtaHeight, kıtaWidth]]; // [[0, 0], [2048, 2048]]
 
-    var aftzaakWidth = 1696;
-    var aftzaakHeight = 2048;
-    var aftzaakBounds = [[0, 0], [aftzaakHeight, aftzaakWidth]]; // [[0, 0], [2048, 1696]]
-
-
-    var map = L.map('map', {
-        crs: L.CRS.Simple,
-        minZoom: -2,
-        maxBounds: kıtaBounds, // Varsayılan olarak kıta sınırları
-        maxBoundsViscosity: 1.0
-    });
-
-    // GÜNCELLENDİ: 0: Kıta, 1-15: Toshokan Tarihi (.webp formatında)
-    var mapImages = [
-        'resimler/Harita.webp',     // index 0
-        'resimler/THarita1.webp',   // index 1
-        'resimler/THarita2.webp',   // index 2
-        'resimler/THarita3.webp',   // index 3
-        'resimler/THarita4.webp',   // index 4
-        'resimler/THarita5.webp',   // index 5
-        'resimler/THarita6.webp',   // index 6
-        'resimler/THarita7.webp',   // index 7
-        'resimler/THarita8.webp',   // index 8
-        'resimler/THarita9.webp',   // index 9
-        'resimler/THarita10.webp',  // index 10
-        'resimler/THarita11.webp',  // index 11
-        'resimler/THarita12.webp',  // index 12
-        'resimler/THarita13.webp',  // index 13
-        'resimler/THarita14.webp',  // index 14
-        'resimler/THarita15.webp'   // index 15
-    ];
-    
-    // Aftzaak haritası için ayrı bir katman
-    var aftzaakMapLayer = L.imageOverlay('resimler/KSehri.png', aftzaakBounds);
-
-    // GÜNCELLENDİ: Açıklamalar 15 haritaya çıkarıldı (Japonca çeviriler eklendi)
-    var mapDescriptions = [
-        "Standart coğrafya haritası. Bu, dünyanın günümüzdeki genel görünümüdür.", // Harita 0
-        "Hikâyenin geçtiği yer, dumanlar içindeki bu dünyadır. Büyüklüğü Almanya kadardır.", // Harita 1 (Japonca 1)
-        "Şu anda tamamen dumanın altında kalmış durumdadır.", // Harita 2 (Japonca 2)
-        "Hikâyenin geçtiği yerin batısında, Tana soyunun (büyük kulak memeli halk) yurdu bulunur. Burada kıtanın altın çağını kurmuşlardır.", // Harita 3 (Japonca 3)
-        "Görkemli (en parlak) dönemlerindeki toprakları / en geniş sınırları.", // Harita 4 (Japonca 4)
-        "Günümüzde (bu bölge) genel olarak ince bir duman tabakasıyla kaplıdır.", // Harita 5 (Japonca 5)
-        "Hikâyenin geçtiği yerin kuzeyinde Omeka soyunun (boynuzlu halk) yurdu bulunur. Bir zamanlar burada, kıta tarihinin en geniş topraklarına sahip olan Maskeli İmparatorluk hüküm sürmüştür.", // Harita 6 (Japonca 6)
-        "Günümüzde hâlâ görece güvende!", // Harita 7 (Japonca 7)
-        "Kıtanın büyük bir bölümünü kaplayan Büyük Çöl'dür. Yaşamın kuruduğu bu toprakların, kadim Ejderha Savaşı'nın son muharebesine sahne olduğu sölenir. Sol kenardaki büyük nehrin yakınında Istayub soyu (esmer tenli halk) bir medeniyet kurmuştur.", // Harita 8 (Japonca 8)
-        "Kıtayı boydan boya geçen büyük nehrin, bir zamanlar ayrı olan kara parçalarının tektonik hareketlerle birleştiği yerdeki 'dikiş izi' olabileceği söylenmektedir.", // Harita 9 (Japonca 9)
-        "Hikâyenin geçtiği yerin güneydoğusundaki subtropikal bölgede Hopi soyunun (uzun kulaklı halk) yurdu bulunur. Bu topraklarda, kanunnamelerle yönetilen en eski krallık kurulmuştur.", // Harita 10 (Japonca 10)
-        "Gnaan'ın bu civarda bir yerde olduğu söylenir. Gerçekten var olup olmadığını bilmiyorum.", // Harita 11 (Japonca 11)
-        "Hikâyenin geçtiği yerin güneyinde Kayuga soyunun (üst kulaklı halk) yurdu bulunur. Bu bölgede birçok halk, Gnaan adındaki efsanevi topraklar için savaşmaya devam ediyordu.", // Harita 12 (Japonca 12)
-        "Hikâyenin geçtiği yerin doğusundaki kanyon bölgesinde Kokopa soyunun (kanatlı halk) yurdu bulunur. Bu bölgenin coğrafyası o kadar çetindir ki, kanatları olmayan halkların burada yaşaması mümkün değildir.", // Harita 13 (Japonca 13)
-        "Görünüşe göre duman felaketinden pek etkilenmemiş. Dumanla çevrelenmelerinin üzerinden 100 yıl geçti; acaba yeni ülkeler mi doğdu, yoksa hiçbir şey değişmedi mi...?", // Harita 14 (Japonca 14)
-        "Hikâyenin geçtiği yerin çok doğusunda tropik bir bölge bulunur. Burada, medeniyet kurmamış birçok azınlık halk, avcılık merkezli bir yaşam sürmekteydi. Araya Büyük Çöl girdiğinden, denizci halklar dışında kimseyle bir etkileşimleri olmamış gibi görünüyor." // Harita 15 (Japonca 15)
-    ];
-    
-    // GÜNCELLENDİ: Sadece Ana Harita başlığına ihtiyaç var
-    var mapTitles = [
-        "Ana Harita"
-    ];
-    
-    var mapLayers = [];
-    var currentActiveMap = null;
-    var currentTarihIndex = 1; // Toshokan Tarihi haritaları 1-15 arası
-    
-    // Aktif katman kontrol panelini (sağ panel) tutmak için değişken
-    var currentLayerControl = null;
-
-    var mapInfoContainer = document.getElementById('map-info');
-    var infoTitle = document.getElementById('info-title');
-    var infoText = document.getElementById('info-text');
-    var buttonContainer = document.getElementById('button-container');
+    var aftzaakWidth = 1696;
+    var aftzaakHeight = 2048;
+    var aftzaakBounds = [[0, 0], [aftzaakHeight, aftzaakWidth]]; // [[0, 0], [2048, 1696]]
 
 
-    // --- TÜM HARİTALARI ARKA PLANDA OLUŞTUR ---
-    mapImages.forEach((url, index) => {
-        // Kıta ve Tarih haritaları 'kıtaBounds' kullanır
-        var layer = L.imageOverlay(url, kıtaBounds);
-        mapLayers.push(layer);
-        
-        if (index === 0) {
-            // Başlangıçta Ana Harita'yı (index 0) ekle
-            layer.addTo(map);
-            currentActiveMap = layer;
-        } 
-    });
+    var map = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: -2,
+        maxBounds: kıtaBounds, // Varsayılan olarak kıta sınırları
+        maxBoundsViscosity: 1.0
+    });
 
-    // Başlangıç view'ı kıta boyutlarına göre ayarlandı
-    map.setView([kıtaHeight / 2, kıtaWidth / 2], -1.25);
+    // GÜNCELLENDİ: 0: Kıta, 1-15: Toshokan Tarihi (.webp formatında)
+    var mapImages = [
+        'resimler/Harita.webp',     // index 0
+        'resimler/THarita1.webp',   // index 1
+        'resimler/THarita2.webp',   // index 2
+        'resimler/THarita3.webp',   // index 3
+        'resimler/THarita4.webp',   // index 4
+        'resimler/THarita5.webp',   // index 5
+        'resimler/THarita6.webp',   // index 6
+        'resimler/THarita7.webp',   // index 7
+        'resimler/THarita8.webp',   // index 8
+        'resimler/THarita9.webp',   // index 9
+        'resimler/THarita10.webp',  // index 10
+        'resimler/THarita11.webp',  // index 11
+        'resimler/THarita12.webp',  // index 12
+        'resimler/THarita13.webp',  // index 13
+        'resimler/THarita14.webp',  // index 14
+        'resimler/THarita15.webp'   // index 15
+    ];
+    
+    // Aftzaak haritası için ayrı bir katman
+    var aftzaakMapLayer = L.imageOverlay('resimler/KSehri.png', aftzaakBounds);
 
-    var Isaret = L.icon({
-        iconUrl: 'resimler/Isaret2.png',
-        iconSize: [48, 48],
-        iconAnchor: [24, 48],
-        popupAnchor: [0, -32]
-    });
+    // *** KOD BURADA GÜNCELLENDİ ***
+    // GÜNCELLENDİ: Açıklamalar 15 haritaya çıkarıldı (İngilizce çeviriler eklendi)
+    var mapDescriptions = [
+        "Standart coğrafya haritası. Bu, dünyanın günümüzdeki genel görünümüdür.", // Harita 0
+        // THarita1 (Index 1)
+        "This is the world within the smoke where the story takes place. It is about the same size as Germany.",
+        // THarita2 (Index 2)
+        "It is currently completely buried in smoke.",
+        // THarita3 (Index 3)
+        "To the west of the story's setting is the homeland of the Tana people (the ethnic group with large earlobes). They established the continent's golden age here.",
+        // THarita4 (Index 4)
+        "Their territory at its peak.",
+        // THarita5 (Index 5)
+        "It is now generally covered by a thin layer of smoke.",
+        // THarita6 (Index 6)
+        "To the north of the story's setting is the homeland of the Omeka people (the horned ethnic group). The Masked Empire, which at one time possessed the most extensive territory in the continent's history, flourished here.",
+        // THarita7 (Index 7)
+        "Still relatively safe today!",
+        // THarita8 (Index 8)
+        "The Great Desert covers a large area of the continent. It is said to be a land devoid of life and the site of the final battle of the ancient Dragon War. Near the great river on the far left, the Istayub people (the dark-skinned ethnic group) built a civilization.",
+        // THarita9 (Index 9)
+        "It is said that the great river running through the continent may be the 'seam' from when the once-separate landmasses were joined by tectonic shifts.",
+->       // THarita10 (Index 10)
+        "In the subtropical region southeast of the story's setting is the homeland of the Hopi people (the long-eared ethnic group). The oldest kingdom, governed by a legal code, flourished in this land.",
+        // THarita11 (Index 11)
+        "Gnaan is said to be somewhere around here. I do not know if it really exists.",
+        // THarita12 (Index 12)
+        "To the south of the story's setting is the homeland of the Kayuga people (the upper-eared ethnic group). In this place, many ethnic groups continued to fight over the legendary land called Gnaan.",
+        // THarita13 (Index 13)
+        "In the canyon region east of the story's setting is the homeland of the Kokopa people (the winged ethnic group). The terrain in this area is so rugged that it is impossible for people without wings to live here.",
+        // THarita14 (Index 14)
+        "It seems the damage from the smoke was minor here. 100 years have passed since it was surrounded by smoke; I wonder if new countries have been born, or if nothing has changed at all...?",
+        // THarita15 (Index 15)
+        "Far to the east of the story's setting is a tropical region. Here, many uncivilized minority groups lived a life centered on hunting. As it is separated by the Great Desert, it seems they had no interaction with anyone other than the sea-faring peoples."
+    ];
+    
+    // GÜNCELLENDİ: Sadece Ana Harita başlığına ihtiyaç var
+    var mapTitles = [
+        "Ana Harita"
+    ];
+    
+    var mapLayers = [];
+    var currentActiveMap = null;
+    var currentTarihIndex = 1; // Toshokan Tarihi haritaları 1-15 arası
+    
+    // Aktif katman kontrol panelini (sağ panel) tutmak için değişken
+    var currentLayerControl = null;
 
-    // --- KATMAN 1: KITA HARİTASI KONUMLARI ---
-    var centerContent = "<h3>HYDİAH TOPRAKLARI</h3><p>Hydiah ırkından Istayu halkının yuvası olan bu bölge... <a href='...'>Devamı</a></p><img src='resimler/Hydiah.png' alt='...'>";
-    var centerMarker = L.marker([1365, 458], {icon: Isaret}).bindPopup(centerContent, { className: 'custom-popup' });
-    var kaleContent = "<h3>Sissiz Alan</h3><p>Acıpelin Gizmeni felaketi sonrası geriye kalan yaşanabilir bölge, boyutu günümüz Almanyası kadardır.</p><img src='resimler/SAHarita.png' alt='...'>"; 
-    var northWestLocation = L.marker([1098, 659], {icon: Isaret}).bindPopup( kaleContent, { className: 'custom-popup' });
-    var lobinContent = "<h3>LOBİN BÖLGESİ</h3><p>İnsanın atası olan Lobino kemir-genine ev sahipliği yapar. Tektonik... <a href='...'>Devamı</a></p><img src='resimler/Lobin.png' alt='Lobino Kemirgeni'>";
-    var lobinLocation = L.marker([1558, 1650], {icon: Isaret}).bindPopup(lobinContent, { className: 'custom-popup' }); 
-    var yoktContent = "<h3>SIRAKADİ BÖLGESİ</h3><p>Syrrana Savaşı'ndan geride kalmış bir savaş alanının kalıntıla- <a href='...'>Devamı</a></p><img src='resimler/Yokt.png' alt='Syrrana Savaşı Alanı'>";
-    var yoktLocation = L.marker([1198, 1019], {icon: Isaret}).bindPopup(yoktContent, { className: 'custom-popup' }); 
-    var karasinaekContent = "<h3>KARASİNAEK BÖLGESİ</h3><p>Sivri kulaklı Haupi halkının yuvası olan bu bölge... <a href='...'>Devamı</a></p><img src='resimler/Kansinaek.png' alt='Karasinaek Bölgesi'>";
-    var karasinaekLocation = L.marker([791, 1077], {icon: Isaret}).bindPopup(karasinaekContent, { className: 'custom-popup' });
-    
-    var locationsLayer = L.layerGroup([centerMarker, northWestLocation, lobinLocation, yoktLocation, karasinaekLocation]);
-
-    // --- KATMAN 2: SİS KATMANI (KITA HARİTASI İÇİN) ---
-    var sisUrl = 'resimler/Bulutlar.png';
-    var sisBounds = [[0, 0], [kıtaHeight, kıtaWidth]]; // Bu da kıta boyutlarında
-    var sisLayer = L.imageOverlay(sisUrl, sisBounds, { opacity: 0.8, interactive: false });
-    
-    // --- KATMAN 3: AFTZAAK KONUMLARI ---
-    
-    // *** DÜZELTME: Marker 1 (Saray) (PS Y: 1527 -> Leaflet Y: 2048 - 1527 = 521) ***
-    var aftzaakContent1 = "<h3>Aftzaanka Sarayı</h3><p>Aftzaak'ın mevcut hükümdarları olan... <a href='#'>Devamı</a></p><img src='resimler/Aftzaanka.png' alt='Aftzaanka Sarayı'>";
-    var aftzaakMarker1 = L.marker([521, 1405], {icon: Isaret}).bindPopup(aftzaakContent1, { className: 'custom-popup' });
-    
-    // *** DÜZELTME: Marker 2 (Enstitü) (PS Y: 1352 -> Leaflet Y: 2048 - 1352 = 696) ***
-    var aftzaakContent2 = "<h3>TOHNE ENSTİTÜSÜ İKİNCİ KAMPÜSÜ</h3><p>Şehirdeki en seçkin alimlerin görev yaptığı... <a href='#'>Devamı</a></p><img src='resimler/Tohne.png' alt='Tohne Enstitüsü'>";
-    var aftzaakMarker2 = L.marker([696, 299], {icon: Isaret}).bindPopup(aftzaakContent2, { className: 'custom-popup' });
-    
-    var aftzaakLocationsLayer = L.layerGroup([aftzaakMarker1, aftzaakMarker2]);
-
-
-    // --- FONKSİYONLAR ---
-
-    // ANA HARİTA DEĞİŞTİRME FONKSİYONU
-    // GÜNCELLENDİ: Tarih modu için başlıkları gizle/göster mantığı eklendi
-    function switchMap(index) {
-        var newLayer = mapLayers[index];
-        
-        if (newLayer === currentActiveMap) {
-            return;
-        }
-        
-        // Önceki aktif katman ne olursa olsun (Kıta, Tarih, Aftzaak) kaldır
-        if (currentActiveMap) {
-            map.removeLayer(currentActiveMap);
-        }
-        
-        newLayer.addTo(map);
-        currentActiveMap = newLayer;
-
-        // Harita sınırlarını ve merkezini Kıta/Tarih için ayarla
-        map.setMaxBounds(kıtaBounds);
-        
-        if (index === 0) {
-            // Ana kıta haritası (index 0)
-            map.setView([kıtaHeight / 2, kıtaWidth / 2], -1.25);
-            // Bilgi kutusunu ana harita bilgileriyle doldur (ancak gizli olabilir)
-            infoTitle.textContent = mapTitles[0]; // Sadece 1 başlık var
-            infoText.textContent = mapDescriptions[0];
-        } else {
-            // Toshokan Tarihi haritaları (index 1-15)
-            // Bilgi kutusunu güncelle (başlık gizlenecek)
-            infoText.textContent = mapDescriptions[index];
-            currentTarihIndex = index; // İndeksi de güncelle
-        }
-    }
-    
-    // AFTZAAK HARİTASINA GEÇİŞ FONKSİYONU
-    function switchToAftzaak() {
-        if (currentActiveMap === aftzaakMapLayer) {
-            return;
-        }
-        
-        // Önceki aktif katmanı (Kıta veya Tarih) kaldır
-        if (currentActiveMap) {
-            map.removeLayer(currentActiveMap);
-        }
-        
-        aftzaakMapLayer.addTo(map);
-        currentActiveMap = aftzaakMapLayer;
-
-        // Harita sınırlarını ve merkezini Aftzaak için ayarla
-        map.setMaxBounds(aftzaakBounds);
-        map.setView([aftzaakHeight / 2, aftzaakWidth / 2], -1.25);
-    }
-    
-    // Tüm overlay katmanlarını temizle
-    function clearAllOverlays() {
-        map.removeLayer(locationsLayer);
-        map.removeLayer(sisLayer);
-        map.removeLayer(aftzaakLocationsLayer);
-    }
-
-    // Harita moduna göre sağdaki katman panelini güncelleyen fonksiyon
-    function updateLayerControl(mode) {
-        // 1. Varsa, mevcut katman kontrol panelini kaldır
-        if (currentLayerControl) {
-            map.removeControl(currentLayerControl);
-            currentLayerControl = null;
-        }
-
-        // 2. Yeni moda göre yeni bir panel oluştur
-        if (mode === 'kıta') {
-            var kıtaOverlays = {
-                "Konumlar": locationsLayer,
-                "Sisi Göster": sisLayer
-            };
-            currentLayerControl = L.control.layers(null, kıtaOverlays, { collapsed: false }).addTo(map);
-            
-        } else if (mode === 'aftzaak') {
-            var aftzaakOverlays = {
-                "Konumlar": aftzaakLocationsLayer
-            };
-            currentLayerControl = L.control.layers(null, aftzaakOverlays, { collapsed: false }).addTo(map);
-        }
-        // 'tarih' modundaysa, hiçbir panel oluşturulmaz (currentLayerControl = null olarak kalır)
-    }
+    var mapInfoContainer = document.getElementById('map-info');
+    var infoTitle = document.getElementById('info-title');
+    var infoText = document.getElementById('info-text');
+    var buttonContainer = document.getElementById('button-container');
 
 
-    // --- OLAY DİNLEYİCİLERİ (EVENT LISTENERS) ---
+    // --- TÜM HARİTALARI ARKA PLANDA OLUŞTUR ---
+    mapImages.forEach((url, index) => {
+        // Kıta ve Tarih haritaları 'kıtaBounds' kullanır
+        var layer = L.imageOverlay(url, kıtaBounds);
+        mapLayers.push(layer);
+        
+        if (index === 0) {
+            // Başlangıçta Ana Harita'yı (index 0) ekle
+            layer.addTo(map);
+            currentActiveMap = layer;
+        } 
+    });
 
-    // 1. SOL PANEL (HARİTA MODU) DİNLEYİCİSİ
-    // GÜNCELLENDİ: Tarih modunda başlığı gizle, diğerlerinde göster
-    document.getElementById('left-panel').addEventListener('change', function(e) {
-        if (e.target.name === 'map-mode') {
-            
-            clearAllOverlays(); // Önce tüm konum/sis katmanlarını haritadan temizle
-            
-            var newMode = e.target.value;
-            
-            // Mod ne olursa olsun, önce sağ paneli güncelle
-            updateLayerControl(newMode);
-            
-            switch (newMode) {
-                case 'kıta':
-                    switchMap(0); // Ana Harita'ya (index 0) geç
-                    
-                    // Arayüzü ayarla
-                    buttonContainer.style.display = 'none';
-                    mapInfoContainer.style.display = 'none';
-                    infoTitle.style.display = 'block'; // Başlığı sıfırla (göster)
-                    
-                    // Kıta konumlarını varsayılan olarak ekle
-                    locationsLayer.addTo(map);
-                    break;
-                    
-                case 'tarih':
-                    switchMap(1); // İlk Toshokan Tarihi haritasına (index 1) geç
-                    
-                    // Arayüzü ayarla
-                    buttonContainer.style.display = 'block';
-                    mapInfoContainer.style.display = 'block';
-                    infoTitle.style.display = 'none'; // Başlığı GİZLE
-                    break;
-                    
-                case 'aftzaak':
-                    switchToAftzaak(); // Aftzaak haritasına geç
-                    
-                    // Arayüzü ayarla
-                    buttonContainer.style.display = 'none';
-                    mapInfoContainer.style.display = 'none';
-                    infoTitle.style.display = 'block'; // Başlığı sıfırla (göster)
-                    
-                    // Aftzaak konumlarını varsayılan olarak ekle
-                    aftzaakLocationsLayer.addTo(map);
-                    break;
-            }
-        }
-    });
+    // Başlangıç view'ı kıta boyutlarına göre ayarlandı
+    map.setView([kıtaHeight / 2, kıtaWidth / 2], -1.25);
 
-    // 2. ALT BUTON (TOSHOKAN TARİHİ) DİNLEYİCİSİ
-    // GÜNCELLENDİ: Döngü 4 yerine 15 harita üzerinden yapılıyor
-    buttonContainer.addEventListener('click', function(e) {
-        var target = e.target;
-        
-        // Numaralı butonlar kaldırıldığı için bu blok artık tetiklenmeyecek
-        if (target.tagName === 'BUTTON' && target.dataset.mapIndex) {
-            var index = parseInt(target.dataset.mapIndex, 10);
-            switchMap(index);
-        }
-        
-        // Önceki (←) butonu
-        if (target.id === 'btn-prev') {
-            var newIndex = currentTarihIndex - 1;
-            if (newIndex < 1) {
-                newIndex = 15; // 1'den 15'e döngü yap
-            }
-            switchMap(newIndex);
-        }
-        
-        // Sonraki (→) butonu
-        if (target.id === 'btn-next') {
-            var newIndex = currentTarihIndex + 1;
-            if (newIndex > 15) {
-                newIndex = 1; // 15'ten 1'e döngü yap
-            }
-            switchMap(newIndex);
-        }
-    });
-    
-    
-    // --- BAŞLANGIÇ AYARLARI ---
-    function initializeMapState() {
-        // Başlangıçta 'kıta' modu için sağ paneli oluştur
-        updateLayerControl('kıta');
-        
-        // Başlangıç katmanını haritaya ekle
-        locationsLayer.addTo(map);
-        
-        // Diğer paneller gizli olsun
-        buttonContainer.style.display = 'none';
-        mapInfoContainer.style.display = 'none';
-    }
-    
-    initializeMapState();
+    var Isaret = L.icon({
+        iconUrl: 'resimler/Isaret2.png',
+        iconSize: [48, 48],
+        iconAnchor: [24, 48],
+        popupAnchor: [0, -32]
+    });
+
+    // --- KATMAN 1: KITA HARİTASI KONUMLARI ---
+    var centerContent = "<h3>HYDİAH TOPRAKLARI</h3><p>Hydiah ırkından Istayu halkının yuvası olan bu bölge... <a href='...'>Devamı</a></p><img src='resimler/Hydiah.png' alt='...'>";
+    var centerMarker = L.marker([1365, 458], {icon: Isaret}).bindPopup(centerContent, { className: 'custom-popup' });
+    var kaleContent = "<h3>Sissiz Alan</h3><p>Acıpelin Gizmeni felaketi sonrası geriye kalan yaşanabilir bölge, boyutu günümüz Almanyası kadardır.</p><img src='resimler/SAHarita.png' alt='...'>"; 
+    var northWestLocation = L.marker([1098, 659], {icon: Isaret}).bindPopup( kaleContent, { className: 'custom-popup' });
+    var lobinContent = "<h3>LOBİN BÖLGESİ</h3><p>İnsanın atası olan Lobino kemir-genine ev sahipliği yapar. Tektonik... <a href='...'>Devamı</a></p><img src='resimler/Lobin.png' alt='Lobino Kemirgeni'>";
+    var lobinLocation = L.marker([1558, 1650], {icon: Isaret}).bindPopup(lobinContent, { className: 'custom-popup' }); 
+    var yoktContent = "<h3>SIRAKADİ BÖLGESİ</h3><p>Syrrana Savaşı'ndan geride kalmış bir savaş alanının kalıntıla- <a href='...'>Devamı</a></p><img src='resimler/Yokt.png' alt='Syrrana Savaşı Alanı'>";
+    var yoktLocation = L.marker([1198, 1019], {icon: Isaret}).bindPopup(yoktContent, { className: 'custom-popup' }); 
+    var karasinaekContent = "<h3>KARASİNAEK BÖLGESİ</h3><p>Sivri kulaklı Haupi halkının yuvası olan bu bölge... <a href='...'>Devamı</a></p><img src='resimler/Kansinaek.png' alt='Karasinaek Bölgesi'>";
+    var karasinaekLocation = L.marker([791, 1077], {icon: Isaret}).bindPopup(karasinaekContent, { className: 'custom-popup' });
+    
+    var locationsLayer = L.layerGroup([centerMarker, northWestLocation, lobinLocation, yoktLocation, karasinaekLocation]);
+
+    // --- KATMAN 2: SİS KATMANI (KITA HARİTASI İÇİN) ---
+    var sisUrl = 'resimler/Bulutlar.png';
+    var sisBounds = [[0, 0], [kıtaHeight, kıtaWidth]]; // Bu da kıta boyutlarında
+    var sisLayer = L.imageOverlay(sisUrl, sisBounds, { opacity: 0.8, interactive: false });
+    
+    // --- KATMAN 3: AFTZAAK KONUMLARI ---
+    
+    // *** DÜZELTME: Marker 1 (Saray) (PS Y: 1527 -> Leaflet Y: 2048 - 1527 = 521) ***
+    var aftzaakContent1 = "<h3>Aftzaanka Sarayı</h3><p>Aftzaak'ın mevcut hükümdarları olan... <a href='#'>Devamı</a></p><img src='resimler/Aftzaanka.png' alt='Aftzaanka Sarayı'>";
+    var aftzaakMarker1 = L.marker([521, 1405], {icon: Isaret}).bindPopup(aftzaakContent1, { className: 'custom-popup' });
+    
+    // *** DÜZELTME: Marker 2 (Enstitü) (PS Y: 1352 -> Leaflet Y: 2048 - 1352 = 696) ***
+    var aftzaakContent2 = "<h3>TOHNE ENSTİTÜSÜ İKİNCİ KAMPÜSÜ</h3><p>Şehirdeki en seçkin alimlerin görev yaptığı... <a href='#'>Devamı</a></p><img src='resimler/Tohne.png' alt='Tohne Enstitüsü'>";
+    var aftzaakMarker2 = L.marker([696, 299], {icon: Isaret}).bindPopup(aftzaakContent2, { className: 'custom-popup' });
+    
+    var aftzaakLocationsLayer = L.layerGroup([aftzaakMarker1, aftzaakMarker2]);
+
+
+    // --- FONKSİYONLAR ---
+
+    // ANA HARİTA DEĞİŞTİRME FONKSİYONU
+    // GÜNCELLENDİ: Tarih modu için başlıkları gizle/göster mantığı eklendi
+    function switchMap(index) {
+        var newLayer = mapLayers[index];
+        
+        if (newLayer === currentActiveMap) {
+            return;
+        }
+        
+        // Önceki aktif katman ne olursa olsun (Kıta, Tarih, Aftzaak) kaldır
+        if (currentActiveMap) {
+            map.removeLayer(currentActiveMap);
+        }
+        
+        newLayer.addTo(map);
+        currentActiveMap = newLayer;
+
+        // Harita sınırlarını ve merkezini Kıta/Tarih için ayarla
+        map.setMaxBounds(kıtaBounds);
+        
+        if (index === 0) {
+            // Ana kıta haritası (index 0)
+            map.setView([kıtaHeight / 2, kıtaWidth / 2], -1.25);
+            // Bilgi kutusunu ana harita bilgileriyle doldur (ancak gizli olabilir)
+            infoTitle.textContent = mapTitles[0]; // Sadece 1 başlık var
+            infoText.textContent = mapDescriptions[0];
+        } else {
+            // Toshokan Tarihi haritaları (index 1-15)
+            // Bilgi kutusunu güncelle (başlık gizlenecek)
+            infoText.textContent = mapDescriptions[index];
+            currentTarihIndex = index; // İndeksi de güncelle
+        }
+    }
+    
+    // AFTZAAK HARİTASINA GEÇİŞ FONKSİYONU
+    function switchToAftzaak() {
+        if (currentActiveMap === aftzaakMapLayer) {
+            return;
+        }
+        
+        // Önceki aktif katmanı (Kıta veya Tarih) kaldır
+        if (currentActiveMap) {
+            map.removeLayer(currentActiveMap);
+        }
+        
+        aftzaakMapLayer.addTo(map);
+        currentActiveMap = aftzaakMapLayer;
+
+        // Harita sınırlarını ve merkezini Aftzaak için ayarla
+        map.setMaxBounds(aftzaakBounds);
+        map.setView([aftzaakHeight / 2, aftzaakWidth / 2], -1.25);
+    }
+    
+    // Tüm overlay katmanlarını temizle
+    function clearAllOverlays() {
+        map.removeLayer(locationsLayer);
+        map.removeLayer(sisLayer);
+        map.removeLayer(aftzaakLocationsLayer);
+    }
+
+    // Harita moduna göre sağdaki katman panelini güncelleyen fonksiyon
+    function updateLayerControl(mode) {
+        // 1. Varsa, mevcut katman kontrol panelini kaldır
+        if (currentLayerControl) {
+            map.removeControl(currentLayerControl);
+            currentLayerControl = null;
+        }
+
+        // 2. Yeni moda göre yeni bir panel oluştur
+        if (mode === 'kıta') {
+            var kıtaOverlays = {
+                "Konumlar": locationsLayer,
+                "Sisi Göster": sisLayer
+            };
+            currentLayerControl = L.control.layers(null, kıtaOverlays, { collapsed: false }).addTo(map);
+            
+        } else if (mode === 'aftzaak') {
+            var aftzaakOverlays = {
+                "Konumlar": aftzaakLocationsLayer
+            };
+            currentLayerControl = L.control.layers(null, aftzaakOverlays, { collapsed: false }).addTo(map);
+        }
+        // 'tarih' modundaysa, hiçbir panel oluşturulmaz (currentLayerControl = null olarak kalır)
+    }
+
+
+    // --- OLAY DİNLEYİCİLERİ (EVENT LISTENERS) ---
+
+    // 1. SOL PANEL (HARİTA MODU) DİNLEYİCİSİ
+    // GÜNCELLENDİ: Tarih modunda başlığı gizle, diğerlerinde göster
+    document.getElementById('left-panel').addEventListener('change', function(e) {
+        if (e.target.name === 'map-mode') {
+            
+            clearAllOverlays(); // Önce tüm konum/sis katmanlarını haritadan temizle
+            
+            var newMode = e.target.value;
+            
+            // Mod ne olursa olsun, önce sağ paneli güncelle
+            updateLayerControl(newMode);
+            
+            switch (newMode) {
+                case 'kıta':
+                    switchMap(0); // Ana Harita'ya (index 0) geç
+                    
+                    // Arayüzü ayarla
+                    buttonContainer.style.display = 'none';
+                    mapInfoContainer.style.display = 'none';
+                    infoTitle.style.display = 'block'; // Başlığı sıfırla (göster)
+                    
+                    // Kıta konumlarını varsayılan olarak ekle
+                    locationsLayer.addTo(map);
+                    break;
+                    
+                case 'tarih':
+                    switchMap(1); // İlk Toshokan Tarihi haritasına (index 1) geç
+                    
+                    // Arayüzü ayarla
+                    buttonContainer.style.display = 'block';
+                    mapInfoContainer.style.display = 'block';
+                    infoTitle.style.display = 'none'; // Başlığı GİZLE
+                    break;
+                    
+                case 'aftzaak':
+                    switchToAftzaak(); // Aftzaak haritasına geç
+                    
+                    // Arayüzü ayarla
+G                   buttonContainer.style.display = 'none';
+                    mapInfoContainer.style.display = 'none';
+                    infoTitle.style.display = 'block'; // Başlığı sıfırla (göster)
+                    
+                    // Aftzaak konumlarını varsayılan olarak ekle
+                    aftzaakLocationsLayer.addTo(map);
+                    break;
+            }
+        }
+    });
+
+    // 2. ALT BUTON (TOSHOKAN TARİHİ) DİNLEYİCİSİ
+    // GÜNCELLENDİ: Döngü 4 yerine 15 harita üzerinden yapılıyor
+    buttonContainer.addEventListener('click', function(e) {
+        var target = e.target;
+        
+        // Numaralı butonlar kaldırıldığı için bu blok artık tetiklenmeyecek
+        if (target.tagName === 'BUTTON' && target.dataset.mapIndex) {
+            var index = parseInt(target.dataset.mapIndex, 10);
+            switchMap(index);
+        }
+        
+        // Önceki (←) butonu
+        if (target.id === 'btn-prev') {
+            var newIndex = currentTarihIndex - 1;
+            if (newIndex < 1) {
+  	           newIndex = 15; // 1'den 15'e döngü yap
+            }
+            switchMap(newIndex);
+        }
+        
+        // Sonraki (→) butonu
+        if (target.id === 'btn-next') {
+            var newIndex = currentTarihIndex + 1;
+            if (newIndex > 15) {
+                newIndex = 1; // 15'ten 1'e döngü yap
+            }
+            switchMap(newIndex);
+        }
+    });
+    
+    
+    // --- BAŞLANGIÇ AYARLARI ---
+    function initializeMapState() {
+        // Başlangıçta 'kıta' modu için sağ paneli oluştur
+        updateLayerControl('kıta');
+        
+        // Başlangıç katmanını haritaya ekle
+        locationsLayer.addTo(map);
+        
+        // Diğer paneller gizli olsun
+        buttonContainer.style.display = 'none';
+        mapInfoContainer.style.display = 'none';
+    }
+    
+    initializeMapState();
 
 </script>
 
