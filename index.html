@@ -14,7 +14,7 @@
       crossorigin=""></script>
       
     <style>
-        /* ... Tüm CSS kodlarınız buradaydı (değişiklik yok) ... */
+        /* ... Önceki CSS kodları (body, #map) ... */
         body {
             padding: 0;
             margin: 0;
@@ -330,7 +330,6 @@
     });
 
     // --- KATMAN 1: KITA HARİTASI KONUMLARI ---
-    // *** DÜZELTME: KODUNUZUN ORİJİNAL, ÇALIŞAN HALİNE GERİ DÖNÜLDÜ ***
     var centerContent = "<h3>HYDİAH TOPRAKLARI</h3><p>Hydiah ırkından Istayu halkının yuvası olan bu bölge... <a href='...'>Devamı</a></p><img src='resimler/Hydiah.png' alt='...'>";
     var centerMarker = L.marker([1365, 458], {icon: Isaret}).bindPopup(centerContent, { className: 'custom-popup' });
     var kaleContent = "<h3>Sissiz Alan</h3><p>Acıpelin Gizmeni felaketi sonrası geriye kalan yaşanabilir bölge, boyutu günümüz Almanyası kadardır.</p><img src='resimler/SAHarita.png' alt='...'>"; 
@@ -350,7 +349,6 @@
     var sisLayer = L.imageOverlay(sisUrl, sisBounds, { opacity: 0.8, interactive: false });
     
     // --- KATMAN 3: AFTZAAK KONUMLARI ---
-    // *** DÜZELTME: KODUNUZUN ORİJİNAL, ÇALIŞAN HALİNE GERİ DÖNÜLDÜ ***
     
     // *** DÜZELTME: Marker 1 (Saray) (PS Y: 1527 -> Leaflet Y: 2048 - 1527 = 521) ***
     var aftzaakContent1 = "<h3>Aftzaanka Sarayı</h3><p>Aftzaak'ın mevcut hükümdarları olan... <a href='#'>Devamı</a></p><img src='resimler/Aftzaanka.png' alt='Aftzaanka Sarayı'>";
@@ -364,7 +362,6 @@
 
 
     // --- FONKSİYONLAR ---
-    // (Bu bölümdeki fonksiyonlarda değişiklik yapılmadı)
 
     // ANA HARİTA DEĞİŞTİRME FONKSİYONU
     function switchMap(index) {
@@ -450,7 +447,6 @@
 
 
     // --- OLAY DİNLEYİCİLERİ (EVENT LISTENERS) ---
-    // (Bu bölümdeki fonksiyonlarda değişiklik yapılmadı)
 
     // 1. SOL PANEL (HARİTA MODU) DİNLEYİCİSİ
     document.getElementById('left-panel').addEventListener('change', function(e) {
@@ -528,8 +524,6 @@
     
     
     // --- BAŞLANGIÇ AYARLARI ---
-    // (Bu bölümdeki fonksiyonlarda değişiklik yapılmadı)
-
     // Sayfa yüklendiğinde varsayılan (Kıta) durumunu ayarla
     function initializeMapState() {
         // Başlangıçta 'kıta' modu için sağ paneli oluştur
