@@ -88,39 +88,25 @@
             background: #eee;
         }
         
-        /* --- HARİTA BİLGİ KUTUSU (YENİ: ALT ORTA) --- */
+        /* --- HARİTA BİLGİ KUTUSU (SAĞ ALT) --- */
         #map-info {
             position: absolute;
-            bottom: 150px; /* Butonların ve telif hakkı yazısının üstünde kalması için */
-            left: 50%; /* Yeni: Yatayda ortala */
-            transform: translateX(-50%); /* Yeni: Tam olarak ortala */
-            right: auto; /* Sağ hizalamayı kaldır */
+            /* YENİ: Masaüstünde altta ve ortada kalması için left/right oto yaptık */
+            bottom: 150px;
+            right: 10px; 
+            left: auto; /* Masaüstü için sağa hizalı kalsın */
             z-index: 1000;
             background: rgba(255, 255, 255, 0.85); 
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            max-width: 300px; /* Masaüstünde sabit genişlik */
-            width: 90%; /* Mobil için esneklik */
-            box-sizing: border-box; /* Padding'in genişliğe dahil olmasını sağla */
+            max-width: 300px;
             font-family: sans-serif;
             line-height: 1.4;
             
             /* Başlangıçta gizli */
             display: none; 
         }
-        
-        /* Masaüstünde 300px'i aşmaması için ortalamayı iptal et ve sağa hizala */
-        @media (min-width: 769px) {
-             #map-info {
-                left: auto; /* Ortalama iptal */
-                right: 10px; /* Sağa hizala */
-                transform: none; /* Transform iptal */
-                max-width: 300px; /* Max genişliği koru */
-                width: auto; /* İçeriğe göre genişlik */
-             }
-        }
-
 
         #map-info h4 {
             margin-top: 0;
@@ -199,16 +185,14 @@
                 margin: 0 2px;
             }
 
-            /* 4. Harita Bilgi Kutusunu (Tarih) butonların hemen üstüne ve TAM ORTAYA al */
+            /* 4. Harita Bilgi Kutusunu (Tarih) butonların hemen üstüne ve ORTAYA al */
             #map-info {
                 bottom: 75px; /* Butonların üstü */
                 right: 10px;
                 left: 10px; /* Sol ve sağa yasla (Ekranın %90'ı) */
                 max-width: none; 
-                transform: none; /* Mobil için transform'a gerek yok */
                 padding: 10px;
                 background: rgba(255, 255, 255, 0.9);
-                width: auto; /* Sol-sağ 10px boşlukla otomatik genişlemesi için */
             }
             #map-info h4 {
                 font-size: 14px;
