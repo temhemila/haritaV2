@@ -14,7 +14,7 @@
       crossorigin=""></script>
       
     <style>
-        /* ... Önceki CSS kodları (body, #map, .custom-popup) ... */
+        /* ... Önceki CSS kodları (body, #map) ... */
         body {
             padding: 0;
             margin: 0;
@@ -34,7 +34,7 @@
         }
         .custom-popup .leaflet-popup-content {
             margin: 15px;
-            width: 250px;
+            width: 250px; /* Masaüstü için sabit genişlik */
         }
         .custom-popup h3 {
             margin-top: 0;
@@ -146,6 +146,71 @@
             top: 170px; /* Sol panelin yüksekliğine göre ayarlayabilirsiniz */
         }
         
+
+        /* --- MOBİL UYUMLULUK (MEDIA QUERY) --- */
+        /* Ekran 768px veya daha darsa bu kurallar geçerli olur */
+        @media (max-width: 768px) {
+
+            /* 1. Sol Paneli (Mod Seçimi) küçültüp, yukarıya al */
+            #left-panel {
+                top: 10px; /* 80px'ten 10px'e */
+                left: 10px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.9);
+            }
+            #left-panel h4 {
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+            #left-panel label {
+                font-size: 13px;
+            }
+
+            /* 2. Sağ Paneli (Katmanlar) yukarıya al */
+            .leaflet-top.leaflet-right {
+                top: 10px; /* 170px'ten 10px'e */
+            }
+
+            /* 3. Alt Buton Konteynerini (Tarih) en alta al */
+            #button-container {
+                bottom: 10px; /* 80px'ten 10px'e */
+                padding: 8px;
+                width: 90%; /* Ekranın %90'ını kaplasın */
+                box-sizing: border-box; 
+            }
+            #button-container button {
+                padding: 6px 8px;
+                font-size: 14px;
+                margin: 0 2px;
+            }
+
+            /* 4. Harita Bilgi Kutusunu (Tarih) butonların hemen üstüne al */
+            #map-info {
+                /* 150px'ten ~75px'e (buton yüksekliği + boşluk) */
+                bottom: 75px; 
+                right: 10px;
+                left: 10px; /* Sol ve sağa yasla */
+                width: auto; /* Otomatik genişlik */
+                max-width: none; /* max-width: 300px'ü kaldır */
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.9);
+            }
+            #map-info h4 {
+                font-size: 14px;
+            }
+            #map-info p {
+                font-size: 13px;
+                line-height: 1.3;
+            }
+
+            /* 5. Popup'ları daha duyarlı yap */
+            .custom-popup .leaflet-popup-content {
+                width: auto; /* Sabit 250px'i kaldır */
+                max-width: 80vw; /* Ekran genişliğinin en fazla %80'i */
+                margin: 12px;
+            }
+        }
+        
     </style>
 </head>
 <body>
@@ -202,7 +267,7 @@
 
     // 0: Kıta, 1-4: Toshokan Tarihi
     var mapImages = [
-        'resimler/Harita.png',     // index 0
+        'resimler/Harita.png',      // index 0
         'resimler/THarita1.png', // index 1
         'resimler/THarita2.png', // index 2
         'resimler/THarita3.png', // index 3
