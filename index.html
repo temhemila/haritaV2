@@ -1,202 +1,285 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Toshokan - MapLibre Edition</title>
+    <title>Toshokan - Arcane Edition</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link href="https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.css" rel="stylesheet" />
-    
     <script src="https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.js"></script>
       
     <style>
+        /* --- ARKAN RENK PALETİ VE DEĞİŞKENLER --- */
+        :root {
+            --bg-glass: rgba(15, 18, 26, 0.82);
+            --border-amber: rgba(212, 175, 55, 0.35);
+            --border-amber-glow: rgba(212, 175, 55, 0.7);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --gold: #d4af37;
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
         body {
             padding: 0;
             margin: 0;
             overflow: hidden;
+            font-family: var(--font-body);
+            background-color: #0d0f14;
         }
         
         #map { 
             height: 100vh; 
             width: 100%; 
-            background-color: #333;
+            background-color: #0d0f14;
         }
 
-        /* --- POPUP CSS --- */
-        .custom-popup .maplibregl-popup-content {
-            background: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            padding: 15px;
-            width: 250px; /* Masaüstü için sabit genişlik */
-            font-family: sans-serif;
+        /* --- ORTAK PANEL STİLLERİ (GLASSMORPHISM) --- */
+        .arcane-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-amber);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(212, 175, 55, 0.05);
+            color: var(--text-primary);
+            padding: 18px;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .custom-popup h3 {
+        
+        .arcane-panel h4 {
+            font-family: var(--font-title);
+            color: var(--gold);
             margin-top: 0;
-            margin-bottom: 10px;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            font-size: 16px;
-        }
-        .custom-popup p {
-            margin: 5px 0 10px 0;
-            color: #555;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-        .custom-popup img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin-top: 5px;
-        }
-        .maplibregl-popup-close-button {
-            padding: 4px 8px;
-            font-size: 16px;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            font-size: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-amber);
+            padding-bottom: 6px;
         }
 
-        /* --- ÖZEL İŞARETÇİ (MARKER) SİLÜETİ --- */
+        /* --- SOL PANEL (HARİTA MODU) --- */
+        #left-panel {
+            position: absolute;
+            top: 25px; 
+            left: 25px;
+            width: 220px;
+        }
+
+        /* Segmented Kontrol Seçenekleri */
+        .mode-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .mode-selector label {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .mode-selector label:hover {
+            background: rgba(212, 175, 55, 0.08);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+        .mode-selector input[type="radio"] {
+            display: none; /* Standart yuvarlağı gizle */
+        }
+        .mode-selector label:has(input:checked) {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+            color: #fff;
+        }
+
+        /* --- SAĞ PANEL (KATMAN KONTROLÜ) --- */
+        #right-panel {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 180px;
+            display: none;
+        }
+        .layer-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .layer-selector label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+        .layer-selector input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        /* --- HARİTA BİLGİ KUTUSU (SAĞ ALT) --- */
+        #map-info {
+            position: absolute;
+            bottom: 25px;
+            right: 25px; 
+            max-width: 320px;
+            display: none;
+        }
+        #map-info p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        /* --- TOSHOKAN TARİHİ BUTONLARI (ALT ORTA) --- */
+        #button-container {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-amber);
+            padding: 6px;
+            border-radius: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        #button-container button {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        #button-container button:hover {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+        }
+        #button-container button svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* --- ÖZEL POPUP VE MARKER TASARIMLARI --- */
         .custom-marker {
-            width: 48px;
-            height: 48px;
+            width: 42px;
+            height: 42px;
             background-image: url('resimler/Isaret2.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+            filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5));
             cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .custom-marker:hover {
+            transform: scale(1.15);
         }
 
-        /* --- TOSHOKAN TARİHİ BUTON KONTEYNERİ (ALT ORTA) --- */
-        #button-container {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            display: none; /* Başlangıçta gizli */
+        .custom-popup .maplibregl-popup-content {
+            background: #11141d;
+            border: 1px solid var(--border-amber);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            padding: 16px;
+            width: 260px;
+            font-family: var(--font-body);
+            color: var(--text-primary);
         }
-
-        #button-container button {
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 5px 10px;
-            cursor: pointer;
-            margin: 0 3px;
-            min-width: 30px;
+        .custom-popup .maplibregl-popup-tip {
+            border-top-color: var(--border-amber) !important;
+            border-bottom-color: var(--border-amber) !important;
         }
-        #button-container button:hover { background: #f4f4f4; }
-        #button-container button:active { background: #eee; }
-        
-        /* --- HARİTA BİLGİ KUTUSU (SAĞ ALT) --- */
-        #map-info {
-            position: absolute;
-            bottom: 150px;
-            right: 10px; 
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.85); 
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            max-width: 300px;
-            font-family: sans-serif;
-            line-height: 1.4;
-            display: none; /* Başlangıçta gizli */
-        }
-
-        #map-info h4 {
+        .custom-popup h3 {
+            font-family: var(--font-title);
             margin-top: 0;
-            margin-bottom: 5px;
-            color: #333;
+            margin-bottom: 8px;
+            color: var(--gold);
+            font-size: 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+            padding-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .custom-popup p {
+            margin: 6px 0 12px 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+        .custom-popup a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .custom-popup a:hover { text-decoration: underline; }
+        .custom-popup img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 4px;
+        }
+        .maplibregl-popup-close-button {
+            color: var(--text-secondary);
+            padding: 6px 10px;
             font-size: 16px;
         }
-        
-        #map-info p {
-            margin: 0;
-            color: #555;
-            font-size: 14px;
-        }
-        
-        /* --- SOL KONTROL PANELİ (HARİTA MODLARI) --- */
-        #left-panel {
-            position: absolute;
-            top: 80px; 
-            left: 10px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            font-family: sans-serif;
-        }
-        #left-panel h4 { margin-top: 0; margin-bottom: 10px; }
-        #left-panel label { display: block; margin-bottom: 5px; cursor: pointer; }
-        
-        /* --- YENİ KATMAN KONTROL PANELİ (SAĞ ÜST-ORTA) --- */
-        #right-panel {
-            position: absolute;
-            top: 170px;
-            right: 10px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            font-family: sans-serif;
-            display: none;
-        }
-        #right-panel label { display: block; margin-bottom: 5px; cursor: pointer; font-size: 14px; }
+        .maplibregl-popup-close-button:hover { color: #fff; background: transparent; }
 
-        /* --- MOBİL UYUMLULUK (MEDIA QUERY) --- */
+        /* --- MOBİL UYUMLULUK --- */
         @media (max-width: 768px) {
             #left-panel {
-                top: 10px;
-                left: 10px;
-                padding: 10px;
-                background: rgba(255, 255, 255, 0.9);
+                top: 15px; left: 15px; right: 15px;
+                width: calc(100% - 66px);
+                padding: 12px;
             }
-            #left-panel h4 { font-size: 14px; margin-bottom: 5px; }
-            #left-panel label { font-size: 13px; }
+            .mode-selector { flex-direction: row; gap: 4px; }
+            .mode-selector label { flex: 1; justify-content: center; padding: 8px 4px; font-size: 11px; }
+            #left-panel h4 { display: none; } /* Mobilde başlığı gizle yer açılsın */
 
             #right-panel {
-                top: 10px;
-                right: 10px;
-                padding: 8px;
+                top: auto; bottom: 85px; left: 15px; right: 15px;
+                width: calc(100% - 66px);
+                padding: 12px;
             }
+            .layer-selector { flex-direction: row; justify-content: space-around; }
 
-            #button-container {
-                bottom: 10px;
-                padding: 8px;
-                width: 90%;
-                box-sizing: border-box; 
-            }
-            #button-container button {
-                padding: 6px 8px;
-                font-size: 14px;
-                margin: 0 2px;
-            }
+            #button-container { bottom: 15px; width: 120px; }
 
             #map-info {
-                bottom: 75px; 
-                right: 10px;
-                left: 10px;
-                width: auto;
+                bottom: 145px; left: 15px; right: 15px;
                 max-width: none;
-                padding: 10px;
-                background: rgba(255, 255, 255, 0.9);
+                padding: 12px;
             }
-            #map-info h4 { font-size: 14px; }
-            #map-info p { font-size: 13px; line-height: 1.3; }
+            #map-info h4 { font-size: 13px; }
+            #map-info p { font-size: 12px; }
 
-            .custom-popup .maplibregl-popup-content {
-                width: auto;
-                max-width: 75vw;
-            }
+            .custom-popup .maplibregl-popup-content { max-width: 70vw; }
         }
     </style>
 </head>
@@ -204,41 +287,42 @@
 
 <div id="map"></div>
 
-<div id="left-panel">
-    <h4>Harita Modu</h4>
-    <label>
-        <input type="radio" name="map-mode" value="kıta" checked> Kıta haritası
-    </label>
-    <label>
-        <input type="radio" name="map-mode" value="tarih"> Toshokan tarihi
-    </label>
-    <label>
-        <input type="radio" name="map-mode" value="aftzaak"> Aftzaak
-    </label>
+<div id="left-panel" class="arcane-panel">
+    <h4>Harita Arşivi</h4>
+    <div class="mode-selector">
+        <label>
+            <input type="radio" name="map-mode" value="kıta" checked> Kıta Haritası
+        </label>
+        <label>
+            <input type="radio" name="map-mode" value="tarih"> Tarih Kayıtları
+        </label>
+        <label>
+            <input type="radio" name="map-mode" value="aftzaak"> Aftzaak Şehri
+        </label>
+    </div>
 </div>
 
-<div id="right-panel"></div>
+<div id="right-panel" class="arcane-panel"></div>
 
-<div id="map-info">
+<div id="map-info" class="arcane-panel">
     <h4 id="info-title">Harita Açıklaması</h4>
     <p id="info-text">Aktif harita ile ilgili açıklamalar burada görüntülenecektir.</p>
 </div>
 
 <div id="button-container">
-    <button id="btn-prev">←</button>
-    <button id="btn-next">→</button>
+    <button id="btn-prev" title="Önceki Çağ">
+        <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+    </button>
+    <button id="btn-next" title="Sonraki Çağ">
+        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+    </button>
 </div>
 
 <script>
-    // --- HARİTA BOYUTLARI VE PROJEKSİYON MATRİSİ ---
-    // Maplibre'de pikselleri Lat/Lng düzlemine taşımak için bir ölçek çarpanı kullanıyoruz.
+    // --- TEMEL VERİLER VE KOORDİNAT SİSTEMİ ---
     var SCALE = 0.05; 
-
-    var kıtaWidth = 2048;
-    var kıtaHeight = 2048;
-
-    var aftzaakWidth = 1696;
-    var aftzaakHeight = 2048;
+    var kıtaWidth = 2048, kıtaHeight = 2048;
+    var aftzaakWidth = 1696, aftzaakHeight = 2048;
     
     var tarihDimensions = [
         [0, 0], 
@@ -247,34 +331,23 @@
         [1528, 1390], [1804, 1410], [1592, 1560], [1556, 1554], [1664, 1636]
     ];
 
-    // MapLibre Image katmanları için koordinat matrisi üreten fonksiyon [TopLeft, TopRight, BottomRight, BottomLeft]
     function generateCoordinates(w, h) {
-        return [
-            [0, h * SCALE],
-            [w * SCALE, h * SCALE],
-            [w * SCALE, 0],
-            [0, 0]
-        ];
+        return [[0, h * SCALE], [w * SCALE, h * SCALE], [w * SCALE, 0], [0, 0]];
     }
 
-    // Leaflet'taki [Y, X] sistemini MapLibre [Lng, Lat] sistemine çeviren fonksiyon
     function toLngLat(leafletCoords) {
         return [leafletCoords[1] * SCALE, leafletCoords[0] * SCALE];
     }
 
-    // MapLibre Harita Başlatma (WebGL)
+    // MapLibre Motorunu Kurma
     var map = new maplibregl.Map({
         container: 'map',
         style: {
             version: 8,
             sources: {},
-            layers: [{
-                id: 'background',
-                type: 'background',
-                paint: { 'background-color': '#333' }
-            }]
+            layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#0d0f14' } }]
         },
-        dragRotate: false, // Haritayı düz tutmak için döndürmeyi kapattık
+        dragRotate: false,
         pitchWithRotate: false
     });
 
@@ -309,7 +382,6 @@
     var currentTarihIndex = 1;
     var currentMode = 'kıta';
 
-    // --- İÇERİKLER VE MARKER TANIMLAMALARI ---
     var contentKıta = [
         { c: "<h3>HYDİAH TOPRAKLARI</h3><p>Hydiah ırkından Istayu halkının yuvası olan bu bölge... <a href='...'>Devamı</a></p><img src='resimler/Hydiah.png'>", p: [1365, 458] },
         { c: "<h3>Sissiz Alan</h3><p>Acıpelin Gizmeni felaketi sonrası geriye kalan yaşanabilir bölge, boyutu günümüz Almanyası kadardır.</p><img src='resimler/SAHarita.png'>", p: [1098, 659] },
@@ -323,66 +395,37 @@
         { c: "<h3>TOHNE ENSTİTÜSÜ İKİNCİ KAMPÜSÜ</h3><p>Şehirdeki en seçkin alimlerin görev yaptığı... <a href='#'>Devamı</a></p><img src='resimler/Tohne.png'>", p: [696, 299] }
     ];
 
-    var kıtaMarkers = [];
-    var aftzaakMarkers = [];
+    var kıtaMarkers = [], aftzaakMarkers = [];
 
-    // Marker'ları oluşturma fonksiyonu
     function createMaplibreMarker(info) {
         var el = document.createElement('div');
         el.className = 'custom-marker';
-        
-        var popup = new maplibregl.Popup({ offset: [0, -20], className: 'custom-popup', maxWidth: 'none' })
-            .setHTML(info.c);
-            
-        return new maplibregl.Marker({ element: el })
-            .setLngLat(toLngLat(info.p))
-            .setPopup(popup);
+        var popup = new maplibregl.Popup({ offset: [0, -20], className: 'custom-popup', maxWidth: 'none' }).setHTML(info.c);
+        return new maplibregl.Marker({ element: el }).setLngLat(toLngLat(info.p)).setPopup(popup);
     }
 
-    // Harita tamamen yüklendiğinde çalışacak ana blok
     map.on('load', function () {
-        
-        // 1. Katmanları haritaya ekle (Ana Harita, Aftzaak ve Sis)
-        map.addSource('main-map-source', {
-            type: 'image',
-            url: mapImages[0],
-            coordinates: generateCoordinates(kıtaWidth, kıtaHeight)
-        });
+        map.addSource('main-map-source', { type: 'image', url: mapImages[0], coordinates: generateCoordinates(kıtaWidth, kıtaHeight) });
         map.addLayer({ id: 'main-map-layer', type: 'raster', source: 'main-map-source' });
 
-        map.addSource('aftzaak-source', {
-            type: 'image',
-            url: 'resimler/KSehri.png',
-            coordinates: generateCoordinates(aftzaakWidth, aftzaakHeight)
-        });
+        map.addSource('aftzaak-source', { type: 'image', url: 'resimler/KSehri.png', coordinates: generateCoordinates(aftzaakWidth, aftzaakHeight) });
         map.addLayer({ id: 'aftzaak-layer', type: 'raster', source: 'aftzaak-source', layout: { visibility: 'none' } });
 
-        map.addSource('sis-source', {
-            type: 'image',
-            url: 'resimler/Bulutlar.webp',
-            coordinates: generateCoordinates(kıtaWidth, kıtaHeight)
-        });
-        map.addLayer({ id: 'sis-layer', type: 'raster', source: 'sis-source', layout: { visibility: 'none' }, paint: { 'raster-opacity': 0.8 } });
+        map.addSource('sis-source', { type: 'image', url: 'resimler/Bulutlar.webp', coordinates: generateCoordinates(kıtaWidth, kıtaHeight) });
+        map.addLayer({ id: 'sis-layer', type: 'raster', source: 'sis-source', layout: { visibility: 'none' }, paint: { 'raster-opacity': 0.75 } });
 
-        // 2. Marker'ları hafızada instantiate et
         contentKıta.forEach(function(info) { kıtaMarkers.push(createMaplibreMarker(info)); });
         contentAftzaak.forEach(function(info) { aftzaakMarkers.push(createMaplibreMarker(info)); });
 
-        // İlk açılış durumunu ayarla
         initializeMapState();
     });
 
-    // Harita görünümünü sınırlandırıp ortalayan fonksiyon (Leaflet setView muadili)
     function setMapBounds(w, h) {
-        var maxBounds = [
-            [0, 0],
-            [w * SCALE, h * SCALE]
-        ];
+        var maxBounds = [[0, 0], [w * SCALE, h * SCALE]];
         map.setMaxBounds(maxBounds);
-        map.fitBounds(maxBounds, { padding: 0, duration: 800 });
+        map.fitBounds(maxBounds, { padding: 40, duration: 800 });
     }
 
-    // HARİTA MODU GEÇİŞ FONKSİYONLARI
     function switchMap(index) {
         var w, h;
         if (index === 0) {
@@ -390,21 +433,14 @@
             document.getElementById('info-title').textContent = "Ana Harita";
             document.getElementById('info-text').textContent = mapDescriptions[0];
         } else {
-            w = tarihDimensions[index][1];
-            h = tarihDimensions[index][0];
+            w = tarihDimensions[index][1]; h = tarihDimensions[index][0];
             document.getElementById('info-text').textContent = mapDescriptions[index];
             currentTarihIndex = index;
         }
 
-        // WebGL avantajı: Yeni haritayı ve koordinatlarını kaymak gibi güncelliyoruz
-        map.getSource('main-map-source').updateImage({
-            url: mapImages[index],
-            coordinates: generateCoordinates(w, h)
-        });
-
+        map.getSource('main-map-source').updateImage({ url: mapImages[index], coordinates: generateCoordinates(w, h) });
         map.setLayoutProperty('main-map-layer', 'visibility', 'visible');
         map.setLayoutProperty('aftzaak-layer', 'visibility', 'none');
-
         setMapBounds(w, h);
     }
 
@@ -420,7 +456,6 @@
         map.setLayoutProperty('sis-layer', 'visibility', 'none');
     }
 
-    // SAĞ PANEL KATMAN KONTROLÜ (Leaflet taklidi)
     function updateLayerControl(mode) {
         var rightPanel = document.getElementById('right-panel');
         rightPanel.innerHTML = '';
@@ -428,21 +463,25 @@
         if (mode === 'kıta') {
             rightPanel.style.display = 'block';
             rightPanel.innerHTML = `
-                <label><input type="checkbox" id="chk-locations" checked> Konumlar</label>
-                <label><input type="checkbox" id="chk-sis"> Sisi Göster</label>
+                <h4>Katmanlar</h4>
+                <div class="layer-selector">
+                    <label><input type="checkbox" id="chk-locations" checked> Noktalar</label>
+                    <label><input type="checkbox" id="chk-sis"> Sisi Aktif Et</label>
+                </div>
             `;
-            
             document.getElementById('chk-locations').addEventListener('change', function(e) {
                 kıtaMarkers.forEach(m => e.target.checked ? m.addTo(map) : m.remove());
             });
             document.getElementById('chk-sis').addEventListener('change', function(e) {
                 map.setLayoutProperty('sis-layer', 'visibility', e.target.checked ? 'visible' : 'none');
             });
-            
         } else if (mode === 'aftzaak') {
             rightPanel.style.display = 'block';
             rightPanel.innerHTML = `
-                <label><input type="checkbox" id="chk-aft-locations" checked> Konumlar</label>
+                <h4>Katmanlar</h4>
+                <div class="layer-selector">
+                    <label><input type="checkbox" id="chk-aft-locations" checked> Konumlar</label>
+                </div>
             `;
             document.getElementById('chk-aft-locations').addEventListener('change', function(e) {
                 aftzaakMarkers.forEach(m => e.target.checked ? m.addTo(map) : m.remove());
@@ -452,9 +491,6 @@
         }
     }
 
-    // --- EVENT LISTENERS (OLAY DİNLEYİCİLERİ) ---
-    
-    // Sol Panel Seçimleri
     document.getElementById('left-panel').addEventListener('change', function(e) {
         if (e.target.name === 'map-mode') {
             clearAllOverlays();
@@ -475,7 +511,7 @@
                     break;
                 case 'tarih':
                     switchMap(1);
-                    btnContainer.style.display = 'block';
+                    btnContainer.style.display = 'inline-flex';
                     infoContainer.style.display = 'block';
                     infoTitle.style.display = 'none';
                     break;
@@ -490,22 +526,21 @@
         }
     });
 
-    // Tarih İleri/Geri Butonları Mekanizması
     document.getElementById('button-container').addEventListener('click', function(e) {
-        var target = e.target;
-        if (target.id === 'btn-prev') {
+        var btn = e.target.closest('button');
+        if (!btn) return;
+        if (btn.id === 'btn-prev') {
             var newIndex = currentTarihIndex - 1;
             if (newIndex < 1) newIndex = 15;
             switchMap(newIndex);
         }
-        if (target.id === 'btn-next') {
+        if (btn.id === 'btn-next') {
             var newIndex = currentTarihIndex + 1;
             if (newIndex > 15) newIndex = 1;
             switchMap(newIndex);
         }
     });
 
-    // BAŞLANGIÇ AYARI
     function initializeMapState() {
         updateLayerControl('kıta');
         switchMap(0);
