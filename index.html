@@ -50,7 +50,10 @@
     <script>
         const map = new maplibregl.Map({
             container: 'map',
-            renderWorldCopies: false, // 👈 HARİTANIN SAĞA SOLA DOĞRU LOOP/TEKRAR YAPMASINI ENGELLER
+            renderWorldCopies: false, 
+            // 1. DEĞİŞİKLİK: Kamera sınırlarını devasa yaptık. 
+            // Böylece haritanın en uç köşelerini bile ekranın ortasına çekebilirsin.
+            maxBounds: [[-320, -80], [320, 80]], 
             style: {
                 version: 8,
                 sources: {},
@@ -58,12 +61,12 @@
                     {
                         id: 'background',
                         type: 'background',
-                        paint: { 'background-color': '#1e1e24' } // Haritanın dışında kalan boşlukların rengi
+                        paint: { 'background-color': '#1e1e24' } 
                     }
                 ]
             },
-            center: [0, 20],
-            zoom: 1.5
+            center: [0, 10],
+            zoom: 1.8
         });
 
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
@@ -79,11 +82,13 @@
             map.addSource('image-source', {
                 type: 'image',
                 url: imageURL,
+                // 2. DEĞİŞİKLİK: 2752x1536 çözünürlüğün (1.79:1) basık durmaması için
+                // enlem sınırlarını tam oranında 70.35 dereceye çektik.
                 coordinates: [
-                    [-180, 85],
-                    [180, 85],
-                    [180, -85],
-                    [-180, -85]
+                    [-180, 70.35],  // Sol Üst
+                    [180, 70.35],   // Sağ Üst
+                    [180, -70.35],  // Sağ Alt
+                    [-180, -70.35]  // Sol Alt
                 ]
             });
 
@@ -96,7 +101,7 @@
                 }
             });
 
-            // İşaretçiler
+            // İşaretçiler (Lokasyonları yeni harita oranına göre güncelleyebilirsin)
             new maplibregl.Marker({ color: '#FF0000' })
                 .setLngLat([30, 30])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Kizil Sehir</h3><p>Burada buyuk bir savas oldu.</p>"))
