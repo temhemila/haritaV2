@@ -50,6 +50,7 @@
     <script>
         const map = new maplibregl.Map({
             container: 'map',
+            renderWorldCopies: false, // 👈 HARİTANIN SAĞA SOLA DOĞRU LOOP/TEKRAR YAPMASINI ENGELLER
             style: {
                 version: 8,
                 sources: {},
@@ -57,7 +58,7 @@
                     {
                         id: 'background',
                         type: 'background',
-                        paint: { 'background-color': '#1e1e24' }
+                        paint: { 'background-color': '#1e1e24' } // Haritanın dışında kalan boşlukların rengi
                     }
                 ]
             },
@@ -78,12 +79,11 @@
             map.addSource('image-source', {
                 type: 'image',
                 url: imageURL,
-                // Koordinatlar Mercator sınırlarına (85 dereceye) çekildi
                 coordinates: [
-                    [-180, 85],  // Sol Üst
-                    [180, 85],   // Sağ Üst
-                    [180, -85],  // Sağ Alt
-                    [-180, -85]  // Sol Alt
+                    [-180, 85],
+                    [180, 85],
+                    [180, -85],
+                    [-180, -85]
                 ]
             });
 
