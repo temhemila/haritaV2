@@ -7,7 +7,7 @@
     <link href="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.css" rel="stylesheet" />
     <script src="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.js"></script>
     <style>
-        body { margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; background-color: #1e1e24; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; }
         .map-title {
             position: absolute;
@@ -51,9 +51,8 @@
         const map = new maplibregl.Map({
             container: 'map',
             renderWorldCopies: false, 
-            // 1. DEĞİŞİKLİK: Kamera sınırlarını devasa yaptık. 
-            // Böylece haritanın en uç köşelerini bile ekranın ortasına çekebilirsin.
-            maxBounds: [[-320, -80], [320, 80]], 
+            // Güvenli harita sınırları (Çökmeyi engeller ama kamerayı çok uzaklara kaydırmana izin verir)
+            maxBounds: [[-170, -75], [170, 75]], 
             style: {
                 version: 8,
                 sources: {},
@@ -65,16 +64,12 @@
                     }
                 ]
             },
-            center: [0, 10],
-            zoom: 1.8
+            center: [0, 0],
+            zoom: 3 // Resim odaklı olduğu için başlangıç zoomunu biraz artırdık
         });
 
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
         map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-
-        map.on('error', function(e) {
-            console.error("Harita Hatası:", e.error);
-        });
 
         map.on('load', function () {
             const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
@@ -82,13 +77,12 @@
             map.addSource('image-source', {
                 type: 'image',
                 url: imageURL,
-                // 2. DEĞİŞİKLİK: 2752x1536 çözünürlüğün (1.79:1) basık durmaması için
-                // enlem sınırlarını tam oranında 70.35 dereceye çektik.
+                // Resmin en-boy oranını (2752x1536) sıfır bozulmayla koruyan yeni düz koordinatlar
                 coordinates: [
-                    [-180, 70.35],  // Sol Üst
-                    [180, 70.35],   // Sağ Üst
-                    [180, -70.35],  // Sağ Alt
-                    [-180, -70.35]  // Sol Alt
+                    [-60, 31.39],  // Sol Üst
+                    [60, 31.39],   // Sağ Üst
+                    [60, -31.39],  // Sağ Alt
+                    [-60, -31.39]  // Sol Alt
                 ]
             });
 
@@ -101,33 +95,33 @@
                 }
             });
 
-            // İşaretçiler (Lokasyonları yeni harita oranına göre güncelleyebilirsin)
+            // İŞARETÇİLER (Yeni koordinat sistemine göre milimetrik olarak yeniden konumlandırıldı)
             new maplibregl.Marker({ color: '#FF0000' })
-                .setLngLat([30, 30])
+                .setLngLat([10, 13.38])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Kizil Sehir</h3><p>Burada buyuk bir savas oldu.</p>"))
                 .addTo(map);
 
             new maplibregl.Marker({ color: '#00FF00' })
-                .setLngLat([-20, -10])
+                .setLngLat([-6.66, -4.46])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Zumrut Ormani</h3><p>Elflerin kralligi.</p>"))
                 .addTo(map);
 
             new maplibregl.Marker({ color: '#FFD700' })
-                .setLngLat([-10, 45])
+                .setLngLat([-3.33, 20.07])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Altin Taht</h3><p>Kuzey Kralligi'nin baskenti.</p>"))
                 .addTo(map);
 
             new maplibregl.Marker({ color: '#FF4500' })
-                .setLngLat([50, -20])
+                .setLngLat([16.66, -8.92])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Kizil Dag</h3><p>Burada yasli bir ejderha uyuyor.</p>"))
                 .addTo(map);
 
             new maplibregl.Marker({ color: '#00FF7F' })
-                .setLngLat([-40, -30])
+                .setLngLat([-13.33, -13.38])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Golge Ormani</h3><p>Elflerin gizli kralligi.</p>"))
                 .addTo(map);
 
-            // Krallık Sınırı
+            // KRALLIK SINIRI (Yeni koordinat sistemine göre oranlandı)
             map.addSource('krallik-sinir', {
                 type: 'geojson',
                 data: {
@@ -135,7 +129,12 @@
                     geometry: {
                         type: 'Polygon',
                         coordinates: [[
-                            [10, 30], [20, 35], [30, 25], [25, 15], [10, 20], [10, 30]
+                            [3.33, 13.38],
+                            [6.66, 15.61],
+                            [10, 11.15],
+                            [8.33, 6.69],
+                            [3.33, 8.92],
+                            [3.33, 13.38]
                         ]]
                     }
                 }
