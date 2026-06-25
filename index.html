@@ -48,7 +48,6 @@
     <div class="map-subtitle">Ejderhalarin, Elflerin ve Kralliklarin Diyari</div>
 
     <script>
-        // GitHub Pages ve yerel sunucularda çakışma olmaması için boş altlık stil oluşturduk
         const map = new maplibregl.Map({
             container: 'map',
             style: {
@@ -58,7 +57,7 @@
                     {
                         id: 'background',
                         type: 'background',
-                        paint: { 'background-color': '#0f172a' } // Harita/Resim yüklenirken görünecek koyu arka plan
+                        paint: { 'background-color': '#1e1e24' } // Koyu gri/kahve arası bir arka plan
                     }
                 ]
             },
@@ -69,20 +68,23 @@
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
         map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 
+        // Hata yakalayıcı: Resim yüklenmezse konsola detay yazdırır
+        map.on('error', function(e) {
+            console.error("Harita Yükleme Hatası Klasörü/Yolu Kontrol Edin:", e.error);
+        });
+
         map.on('load', function () {
-            // =============================================
-            // 🖼️ RESIM DOSYASI (Göreceli Yol ile)
-            // =============================================
+            // Klasör ve dosya adı GitHub'da tamamen KÜÇÜK HARF olmalı
             const imageURL = 'resimler/sigma.webp';
 
             map.addSource('image-source', {
                 type: 'image',
                 url: imageURL,
                 coordinates: [
-                    [-180, 90],
-                    [180, 90],
-                    [180, -90],
-                    [-180, -90]
+                    [-180, 90],  // Sol Üst
+                    [180, 90],   // Sağ Üst
+                    [180, -90],  // Sağ Alt
+                    [-180, -90]  // Sol Alt
                 ]
             });
 
@@ -91,11 +93,11 @@
                 type: 'raster',
                 source: 'image-source',
                 paint: {
-                    'raster-opacity': 0.9
+                    'raster-opacity': 0.95
                 }
             });
 
-            // Isaretciler
+            // İşaretçiler (Markerlar)
             new maplibregl.Marker({ color: '#FF0000' })
                 .setLngLat([30, 30])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Kizil Sehir</h3><p>Burada buyuk bir savas oldu.</p>"))
@@ -121,7 +123,7 @@
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Golge Ormani</h3><p>Elflerin gizli kralligi.</p>"))
                 .addTo(map);
 
-            // Krallik siniri
+            // Krallık Sınırı
             map.addSource('krallik-sinir', {
                 type: 'geojson',
                 data: {
@@ -129,12 +131,7 @@
                     geometry: {
                         type: 'Polygon',
                         coordinates: [[
-                            [10, 30],
-                            [20, 35],
-                            [30, 25],
-                            [25, 15],
-                            [10, 20],
-                            [10, 30]
+                            [10, 30], [20, 35], [30, 25], [25, 15], [10, 20], [10, 30]
                         ]]
                     }
                 }
