@@ -73,17 +73,17 @@
         });
 
         map.on('load', function () {
-            // Sağlanan kesin ve çalışan URL entegre edildi
             const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
 
             map.addSource('image-source', {
                 type: 'image',
                 url: imageURL,
+                // Koordinatlar Mercator sınırlarına (85 dereceye) çekildi
                 coordinates: [
-                    [-180, 90],
-                    [180, 90],
-                    [180, -90],
-                    [-180, -90]
+                    [-180, 85],  // Sol Üst
+                    [180, 85],   // Sağ Üst
+                    [180, -85],  // Sağ Alt
+                    [-180, -85]  // Sol Alt
                 ]
             });
 
