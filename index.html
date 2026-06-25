@@ -59,8 +59,10 @@
         map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 
         map.on('load', function () {
-            // Arka plan resmi
-            const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
+            // =============================================
+            // 🖼️ RESIM DOSYASI (Göreceli Yol ile)
+            // =============================================
+            const imageURL = 'resimler/sigma.webp';
 
             map.addSource('image-source', {
                 type: 'image',
@@ -82,7 +84,7 @@
                 }
             });
 
-            // Isaretciler (Marker)
+            // Isaretciler
             new maplibregl.Marker({ color: '#FF0000' })
                 .setLngLat([30, 30])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Kizil Sehir</h3><p>Burada buyuk bir savas oldu.</p>"))
@@ -108,7 +110,7 @@
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Golge Ormani</h3><p>Elflerin gizli kralligi.</p>"))
                 .addTo(map);
 
-            // Krallik siniri (cokgen)
+            // Krallik siniri
             map.addSource('krallik-sinir', {
                 type: 'geojson',
                 data: {
