@@ -57,7 +57,7 @@
                     {
                         id: 'background',
                         type: 'background',
-                        paint: { 'background-color': '#1e1e24' } // Koyu gri/kahve arası bir arka plan
+                        paint: { 'background-color': '#1e1e24' }
                     }
                 ]
             },
@@ -68,23 +68,22 @@
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
         map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 
-        // Hata yakalayıcı: Resim yüklenmezse konsola detay yazdırır
         map.on('error', function(e) {
-            console.error("Harita Yükleme Hatası Klasörü/Yolu Kontrol Edin:", e.error);
+            console.error("Harita Hatası:", e.error);
         });
 
         map.on('load', function () {
-            // Klasör ve dosya adı GitHub'da tamamen KÜÇÜK HARF olmalı
-            const imageURL = 'resimler/sigma.webp';
+            // Sağlanan kesin ve çalışan URL entegre edildi
+            const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
 
             map.addSource('image-source', {
                 type: 'image',
                 url: imageURL,
                 coordinates: [
-                    [-180, 90],  // Sol Üst
-                    [180, 90],   // Sağ Üst
-                    [180, -90],  // Sağ Alt
-                    [-180, -90]  // Sol Alt
+                    [-180, 90],
+                    [180, 90],
+                    [180, -90],
+                    [-180, -90]
                 ]
             });
 
@@ -97,7 +96,7 @@
                 }
             });
 
-            // İşaretçiler (Markerlar)
+            // İşaretçiler
             new maplibregl.Marker({ color: '#FF0000' })
                 .setLngLat([30, 30])
                 .setPopup(new maplibregl.Popup().setHTML("<h3>Kizil Sehir</h3><p>Burada buyuk bir savas oldu.</p>"))
