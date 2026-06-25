@@ -1,470 +1,153 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-    <title>Toshokan - Arcane Edition (Fixed)</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <link href="https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.css" rel="stylesheet" />
-    <script src="https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.js"></script>
-      
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fantastik Dünya Haritası</title>
+    <link href="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.js"></script>
     <style>
-        :root {
-            --bg-glass: rgba(15, 18, 26, 0.85);
-            --border-amber: rgba(212, 175, 55, 0.35);
-            --text-primary: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --gold: #d4af37;
-            --font-title: 'Cinzel', serif;
-            --font-body: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-            font-family: var(--font-body);
-            background-color: #0d0f14;
-        }
-        
-        #map { 
-            height: 100vh; 
-            width: 100%; 
-            background-color: #0d0f14;
-        }
-
-        .arcane-panel {
-            background: var(--bg-glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-amber);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-            color: var(--text-primary);
-            padding: 18px;
-            z-index: 1000;
-        }
-        
-        .arcane-panel h4 {
-            font-family: var(--font-title);
-            color: var(--gold);
-            margin-top: 0;
-            margin-bottom: 12px;
-            letter-spacing: 1px;
-            font-size: 14px;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border-amber);
-            padding-bottom: 6px;
-        }
-
-        /* --- SOL PANEL --- */
-        #left-panel {
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .map-title {
             position: absolute;
-            top: 25px; 
-            left: 25px;
-            width: 220px;
-        }
-        .mode-selector { display: flex; flex-direction: column; gap: 8px; }
-        .mode-selector label {
-            display: flex;
-            align-items: center;
-            padding: 10px 12px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        .mode-selector label:hover { background: rgba(212, 175, 55, 0.08); border-color: rgba(212, 175, 55, 0.2); }
-        .mode-selector input[type="radio"] { display: none; }
-        .mode-selector label:has(input:checked) {
-            background: rgba(212, 175, 55, 0.15);
-            border-color: var(--gold);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
-            color: #fff;
-        }
-
-        /* --- SAĞ PANEL --- */
-        #right-panel {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            width: 180px;
-            display: none;
-        }
-        .layer-selector { display: flex; flex-direction: column; gap: 8px; }
-        .layer-selector label { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; }
-        .layer-selector input[type="checkbox"] { accent-color: var(--gold); width: 16px; height: 16px; }
-
-        /* --- HARİTA BİLGİ KUTUSU --- */
-        #map-info { position: absolute; bottom: 25px; right: 25px; max-width: 320px; display: none; }
-        #map-info p { margin: 0; color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; }
-
-        /* --- TOSHOKAN TARİHİ BUTONLARI --- */
-        #button-container {
-            position: absolute;
-            bottom: 25px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            display: none;
-            background: var(--bg-glass);
-            border: 1px solid var(--border-amber);
-            padding: 6px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px 24px;
             border-radius: 30px;
-            z-index: 1000;
+            font-family: 'Georgia', serif;
+            font-size: 24px;
+            letter-spacing: 2px;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 1px solid #ffd700;
+            pointer-events: none;
         }
-        #button-container button {
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #button-container button:hover { background: rgba(212, 175, 55, 0.2); color: var(--gold); }
-        #button-container button svg { width: 20px; height: 20px; fill: currentColor; }
-
-        /* --- MARKER VE POPUP --- */
-        .custom-marker {
-            width: 42px;
-            height: 42px;
-            background-image: url('resimler/Isaret2.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .custom-marker:hover { transform: scale(1.15); }
-
-        .custom-popup .maplibregl-popup-content {
-            background: #11141d;
-            border: 1px solid var(--border-amber);
-            border-radius: 12px;
-            padding: 16px;
-            width: 260px;
-            color: var(--text-primary);
-        }
-        .custom-popup h3 { font-family: var(--font-title); margin: 0 0 8px 0; color: var(--gold); font-size: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.15); padding-bottom: 6px; }
-        .custom-popup p { margin: 6px 0 12px 0; color: var(--text-secondary); font-size: 13px; line-height: 1.45; }
-        .custom-popup img { width: 100%; height: auto; border-radius: 6px; }
-        .maplibregl-popup-close-button { color: var(--text-secondary); }
-
-        @media (max-width: 768px) {
-            #left-panel { top: 15px; left: 15px; right: 15px; width: calc(100% - 66px); padding: 12px; }
-            .mode-selector { flex-direction: row; gap: 4px; }
-            .mode-selector label { flex: 1; justify-content: center; padding: 8px 4px; font-size: 11px; }
-            #left-panel h4 { display: none; }
-            #right-panel { top: auto; bottom: 85px; left: 15px; right: 15px; width: calc(100% - 66px); }
-            .layer-selector { flex-direction: row; justify-content: space-around; }
-            #button-container { bottom: 15px; width: 120px; }
-            #map-info { bottom: 145px; left: 15px; right: 15px; max-width: none; }
+        .map-subtitle {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ddd;
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 16px;
+            border-radius: 20px;
+            z-index: 10;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
+    <div id="map"></div>
+    <div class="map-title">Kizil Diyar'in Haritasi</div>
+    <div class="map-subtitle">Ejderhalarin, Elflerin ve Kralliklarin Diyari</div>
 
-<div id="map"></div>
-
-<div id="left-panel" class="arcane-panel">
-    <h4>Harita Arşivi</h4>
-    <div class="mode-selector">
-        <label>
-            <input type="radio" name="map-mode" value="kıta" checked> Kıta Haritası
-        </label>
-        <label>
-            <input type="radio" name="map-mode" value="tarih"> Tarih Kayıtları
-        </label>
-        <label>
-            <input type="radio" name="map-mode" value="aftzaak"> Aftzaak Şehri
-        </label>
-    </div>
-</div>
-
-<div id="right-panel" class="arcane-panel"></div>
-
-<div id="map-info" class="arcane-panel">
-    <h4 id="info-title">Harita Açıklaması</h4>
-    <p id="info-text">Aktif harita ile ilgili açıklamalar burada görüntülenecektir.</p>
-</div>
-
-<div id="button-container">
-    <button id="btn-prev">
-        <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
-    </button>
-    <button id="btn-next">
-        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-    </button>
-</div>
-
-<script>
-    var SCALE = 0.05; 
-    var kıtaWidth = 2048, kıtaHeight = 2048;
-    var aftzaakWidth = 1696, aftzaakHeight = 2048;
-    
-    var tarihDimensions = [
-        [0, 0], 
-        [1538, 1398], [1848, 1350], [1746, 1204], [1986, 1166], [1710, 1404],
-        [1652, 1426], [1342, 1456], [1358, 1458], [1200, 1163], [1542, 1602],
-        [1528, 1390], [1804, 1410], [1592, 1560], [1556, 1554], [1664, 1636]
-    ];
-
-    function generateCoordinates(w, h) {
-        return [[0, h * SCALE], [w * SCALE, h * SCALE], [w * SCALE, 0], [0, 0]];
-    }
-
-    function toLngLat(leafletCoords) {
-        return [leafletCoords[1] * SCALE, leafletCoords[0] * SCALE];
-    }
-
-    // İlk kurulumda kamerayı ortada başlatıyoruz ki kilitlenme olmasın
-    var map = new maplibregl.Map({
-        container: 'map',
-        style: {
-            version: 8,
-            sources: {},
-            layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#0d0f14' } }]
-        },
-        center: [51.2, 51.2],
-        zoom: 1,
-        dragRotate: false,
-        pitchWithRotate: false
-    });
-
-    var mapImages = [
-        'resimler/Harita.webp', 'resimler/THarita1.webp', 'resimler/THarita2.webp',
-        'resimler/THarita3.webp', 'resimler/THarita4.webp', 'resimler/THarita5.webp',
-        'resimler/THarita6.webp', 'resimler/THarita7.webp', 'resimler/THarita8.webp',
-        'resimler/THarita9.webp', 'resimler/THarita10.webp', 'resimler/THarita11.webp',
-        'resimler/THarita12.webp', 'resimler/THarita13.webp', 'resimler/THarita14.webp',
-        'resimler/THarita15.webp'
-    ];
-    
-    var mapDescriptions = [
-        "Standart coğrafya haritası. Bu, dünyanın günümüzdeki genel görünümüdür.",
-        "Hikâyenin geçtiği yer, dumanlar içindeki bu dünyadır. Büyüklüğü yaklaşık Almanya kadardır.",
-        "Hikâyenin geçtiği yerin batısında, Tana soyunun (büyük kulak memeli halk) yurdu bulunur. Burada kıtanın altın çağını kurmuşlardır.",
-        "Şu anda tamamen dumanın altında kalmış durumdadır.",
-        "Hikâyenin geçtiği yerin kuzeyinde Omeka soyunun (boynuzlu halk) yurdu bulunur. Bir zamanlar burada, kıta tarihinin en geniş topraklarına sahip olan Maskeli İmparatorluk hüküm sürmüştür.",
-        "Günümüzde (bu bölge) genel olarak ince bir duman tabakasıyla kaplıdır.",
-        "Görkemli (en parlak) dönemlerindeki toprakları / en geniş sınırları.",
-        "Kıtanın büyük bir bölümünü kaplayan Büyük Çöl'dür. Yaşamın kuruduğu bu toprakların, kadim Ejderha Savaşı'nın son muharebesine sahne olduğu sölenir. Sol kenardaki büyük nehrin yakınında Istayub soyu (esmer tenli halk) bir medeniyet kurmuştur.",
-        "Günümüzde hâlâ görece güvende!",
-        "Kıtayı boydan boya geçen büyük nehrin, bir zamanlar ayrı olan kara parçalarının tektonik hareketlerle birleştiği yerdeki 'dikiş izi' olabileceği söylenmektedir.",
-        "Hikâyenin geçtiği yerin güneydoğusundaki subtropikal bölgede Hopi soyunun (uzun kulaklı halk) yurdu bulunur. Bu topraklarda, kanunnamelerle yönetilen en eski krallık kurulmuştur.",
-        "Hikâyenin geçtiği yerin güneyinde Kayuga soyunun (üst kulaklı halk) yurdu bulunur. Bu bölgede birçok halk, Gnaan adındaki efsanevi topraklar için savaşmaya devam ediyordu.",
-        "Gnaan'ın bu civarda bir yerde olduğu söylenir. Gerçekten var olup olmadığını bilmiyorum.",
-        "Hikâyenin geçtiği yerin doğusundaki kanyon bölgesinde Kokopa soyunun (kanatlı halk) yurdu bulunur. Bu bölgenin coğrafyası o kadar çetindir ki, kanatları olmayan halkların burada yaşaması mümkün değildir.",
-        "Hikâyenin geçtiği yerin çok doğusunda tropik bir bölge bulunur. Burada, medeniyet kurmamış birçok azınlık halk, avcılık merkezli bir yaşam sürmekteydi. Büyük Çöl'ü geçmek zor olduğundan, denizci halklar dışında kimseyle bir etkileşimleri olmamış gibi görünüyor.",
-        "Görünüşe göre duman felaketinden pek etkilenmemiş. Dumanla çevrelenmelerinin üzerinden 100 yıl geçti; acaba yeni ülkeler mi doğdu, yoksa hiçbir şey değişmedi mi...?"
-    ];
-    
-    var currentTarihIndex = 1;
-    var currentMode = 'kıta';
-
-    var contentKıta = [
-        { c: "<h3>HYDİAH TOPRAKLARI</h3><p>Hydiah ırkından Istayu halkının yuvası olan bu bölge...</p><img src='resimler/Hydiah.png'>", p: [1365, 458] },
-        { c: "<h3>Sissiz Alan</h3><p>Acıpelin Gizmeni felaketi sonrası geriye kalan yaşanabilir bölge.</p><img src='resimler/SAHarita.png'>", p: [1098, 659] },
-        { c: "<h3>LOBİN BÖLGESİ</h3><p>İnsanın atası olan Lobino kemir-genine ev sahipliği yapar.</p><img src='resimler/Lobin.png'>", p: [1558, 1650] },
-        { c: "<h3>SIRAKADİ BÖLGESİ</h3><p>Syrrana Savaşı'ndan geride kalmış bir savaş alanının kalıntıları.</p><img src='resimler/Yokt.png'>", p: [1198, 1019] },
-        { c: "<h3>KARASİNAEK BÖLGESİ</h3><p>Sivri kulaklı Haupi halkının yuvası olan bu bölge...</p><img src='resimler/Kansinaek.png'>", p: [791, 1077] }
-    ];
-
-    var contentAftzaak = [
-        { c: "<h3>Aftzaanka Sarayı</h3><p>Aftzaak'ın mevcut hükümdarları olan...</p><img src='resimler/Aftzaanka.png'>", p: [521, 1405] },
-        { c: "<h3>TOHNE ENSTİTÜSÜ İKİNCİ KAMPÜSÜ</h3><p>Şehirdeki en seçkin alimlerin görev yaptığı...</p><img src='resimler/Tohne.png'>", p: [696, 299] }
-    ];
-
-    var kıtaMarkers = [], aftzaakMarkers = [];
-
-    function createMaplibreMarker(info) {
-        var el = document.createElement('div');
-        el.className = 'custom-marker';
-        var popup = new maplibregl.Popup({ offset: [0, -20], className: 'custom-popup', maxWidth: 'none' }).setHTML(info.c);
-        return new maplibregl.Marker({ element: el }).setLngLat(toLngLat(info.p)).setPopup(popup);
-    }
-
-    map.on('load', function () {
-        // TÜM RESİMLERİ BAĞIMSIZ WEBGL KATMANI OLARAK YÜKLÜYORUZ
-        mapImages.forEach(function(url, index) {
-            var w = (index === 0) ? kıtaWidth : tarihDimensions[index][1];
-            var h = (index === 0) ? kıtaHeight : tarihDimensions[index][0];
-            
-            map.addSource('map-source-' + index, {
-                type: 'image',
-                url: url,
-                coordinates: generateCoordinates(w, h)
-            });
-            map.addLayer({
-                id: 'map-layer-' + index,
-                type: 'raster',
-                source: 'map-source-' + index,
-                layout: { visibility: (index === 0) ? 'visible' : 'none' }
-            });
+    <script>
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.openfreemap.org/styles/liberty',
+            center: [0, 20],
+            zoom: 1.5
         });
 
-        // Aftzaak Katmanı
-        map.addSource('aftzaak-source', { type: 'image', url: 'resimler/KSehri.png', coordinates: generateCoordinates(aftzaakWidth, aftzaakHeight) });
-        map.addLayer({ id: 'aftzaak-layer', type: 'raster', source: 'aftzaak-source', layout: { visibility: 'none' } });
+        map.addControl(new maplibregl.NavigationControl(), 'top-right');
+        map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 
-        // Sis Katmanı (Kıta haritasının tam üstüne konumlandı)
-        map.addSource('sis-source', { type: 'image', url: 'resimler/Bulutlar.webp', coordinates: generateCoordinates(kıtaWidth, kıtaHeight) });
-        map.addLayer({ id: 'sis-layer', type: 'raster', source: 'sis-source', layout: { visibility: 'none' }, paint: { 'raster-opacity': 0.75 } });
+        map.on('load', function () {
+            // Arka plan resmi
+            const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
 
-        contentKıta.forEach(function(info) { kıtaMarkers.push(createMaplibreMarker(info)); });
-        contentAftzaak.forEach(function(info) { aftzaakMarkers.push(createMaplibreMarker(info)); });
-
-        initializeMapState();
-    });
-
-    // Kamera Kilitlenme Hatasını Çözen Yeni Bounds Fonksiyonu
-    function setMapBounds(w, h) {
-        var maxBounds = [[0, 0], [w * SCALE, h * SCALE]];
-        map.setMaxBounds(null); // Önce kamerayı serbest bırak
-        map.fitBounds(maxBounds, { padding: 20, duration: 0 }); // Anında haritaya odakla
-        map.setMaxBounds(maxBounds); // Şimdi sınırları kilitleyebilirsin
-    }
-
-    function switchMap(index) {
-        // Tüm katmanları gizle
-        for (var i = 0; i < mapImages.length; i++) {
-            map.setLayoutProperty('map-layer-' + i, 'visibility', 'none');
-        }
-        map.setLayoutProperty('aftzaak-layer', 'visibility', 'none');
-
-        // Hedef katmanı aç (Böylece Kıta Haritası anında geri gelecek)
-        map.setLayoutProperty('map-layer-' + index, 'visibility', 'visible');
-
-        var w, h;
-        if (index === 0) {
-            w = kıtaWidth; h = kıtaHeight;
-            document.getElementById('info-title').textContent = "Ana Harita";
-            document.getElementById('info-text').textContent = mapDescriptions[0];
-        } else {
-            w = tarihDimensions[index][1]; h = tarihDimensions[index][0];
-            document.getElementById('info-text').textContent = mapDescriptions[index];
-            currentTarihIndex = index;
-        }
-
-        setMapBounds(w, h);
-    }
-
-    function switchToAftzaak() {
-        for (var i = 0; i < mapImages.length; i++) {
-            map.setLayoutProperty('map-layer-' + i, 'visibility', 'none');
-        }
-        map.setLayoutProperty('aftzaak-layer', 'visibility', 'visible');
-        setMapBounds(aftzaakWidth, aftzaakHeight);
-    }
-
-    function clearAllOverlays() {
-        kıtaMarkers.forEach(m => m.remove());
-        aftzaakMarkers.forEach(m => m.remove());
-        map.setLayoutProperty('sis-layer', 'visibility', 'none');
-    }
-
-    function updateLayerControl(mode) {
-        var rightPanel = document.getElementById('right-panel');
-        rightPanel.innerHTML = '';
-        
-        if (mode === 'kıta') {
-            rightPanel.style.display = 'block';
-            rightPanel.innerHTML = `
-                <h4>Katmanlar</h4>
-                <div class="layer-selector">
-                    <label><input type="checkbox" id="chk-locations" checked> Noktalar</label>
-                    <label><input type="checkbox" id="chk-sis"> Sisi Aktif Et</label>
-                </div>
-            `;
-            document.getElementById('chk-locations').addEventListener('change', function(e) {
-                kıtaMarkers.forEach(m => e.target.checked ? m.addTo(map) : m.remove());
+            map.addSource('image-source', {
+                type: 'image',
+                url: imageURL,
+                coordinates: [
+                    [-180, 90],
+                    [180, 90],
+                    [180, -90],
+                    [-180, -90]
+                ]
             });
-            // Sis özelliğini tıkır tıkır çalıştıran düzeltme
-            document.getElementById('chk-sis').addEventListener('change', function(e) {
-                map.setLayoutProperty('sis-layer', 'visibility', e.target.checked ? 'visible' : 'none');
+
+            map.addLayer({
+                id: 'image-layer',
+                type: 'raster',
+                source: 'image-source',
+                paint: {
+                    'raster-opacity': 0.9
+                }
             });
-        } else if (mode === 'aftzaak') {
-            rightPanel.style.display = 'block';
-            rightPanel.innerHTML = `
-                <h4>Katmanlar</h4>
-                <div class="layer-selector">
-                    <label><input type="checkbox" id="chk-aft-locations" checked> Konumlar</label>
-                </div>
-            `;
-            document.getElementById('chk-aft-locations').addEventListener('change', function(e) {
-                aftzaakMarkers.forEach(m => e.target.checked ? m.addTo(map) : m.remove());
+
+            // Isaretciler (Marker)
+            new maplibregl.Marker({ color: '#FF0000' })
+                .setLngLat([30, 30])
+                .setPopup(new maplibregl.Popup().setHTML("<h3>Kizil Sehir</h3><p>Burada buyuk bir savas oldu.</p>"))
+                .addTo(map);
+
+            new maplibregl.Marker({ color: '#00FF00' })
+                .setLngLat([-20, -10])
+                .setPopup(new maplibregl.Popup().setHTML("<h3>Zumrut Ormani</h3><p>Elflerin kralligi.</p>"))
+                .addTo(map);
+
+            new maplibregl.Marker({ color: '#FFD700' })
+                .setLngLat([-10, 45])
+                .setPopup(new maplibregl.Popup().setHTML("<h3>Altin Taht</h3><p>Kuzey Kralligi'nin baskenti.</p>"))
+                .addTo(map);
+
+            new maplibregl.Marker({ color: '#FF4500' })
+                .setLngLat([50, -20])
+                .setPopup(new maplibregl.Popup().setHTML("<h3>Kizil Dag</h3><p>Burada yasli bir ejderha uyuyor.</p>"))
+                .addTo(map);
+
+            new maplibregl.Marker({ color: '#00FF7F' })
+                .setLngLat([-40, -30])
+                .setPopup(new maplibregl.Popup().setHTML("<h3>Golge Ormani</h3><p>Elflerin gizli kralligi.</p>"))
+                .addTo(map);
+
+            // Krallik siniri (cokgen)
+            map.addSource('krallik-sinir', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [10, 30],
+                            [20, 35],
+                            [30, 25],
+                            [25, 15],
+                            [10, 20],
+                            [10, 30]
+                        ]]
+                    }
+                }
             });
-        } else {
-            rightPanel.style.display = 'none';
-        }
-    }
 
-    document.getElementById('left-panel').addEventListener('change', function(e) {
-        if (e.target.name === 'map-mode') {
-            clearAllOverlays();
-            currentMode = e.target.value;
-            updateLayerControl(currentMode);
-            
-            var btnContainer = document.getElementById('button-container');
-            var infoContainer = document.getElementById('map-info');
-            var infoTitle = document.getElementById('info-title');
+            map.addLayer({
+                id: 'krallik-sinir-cizgi',
+                type: 'line',
+                source: 'krallik-sinir',
+                paint: {
+                    'line-color': '#FFD700',
+                    'line-width': 4,
+                    'line-dasharray': [3, 3]
+                }
+            });
 
-            switch (currentMode) {
-                case 'kıta':
-                    switchMap(0);
-                    btnContainer.style.display = 'none';
-                    infoContainer.style.display = 'none';
-                    infoTitle.style.display = 'block';
-                    kıtaMarkers.forEach(m => m.addTo(map));
-                    break;
-                case 'tarih':
-                    switchMap(1);
-                    btnContainer.style.display = 'inline-flex';
-                    infoContainer.style.display = 'block';
-                    infoTitle.style.display = 'none';
-                    break;
-                case 'aftzaak':
-                    switchToAftzaak();
-                    btnContainer.style.display = 'none';
-                    infoContainer.style.display = 'none';
-                    infoTitle.style.display = 'block';
-                    aftzaakMarkers.forEach(m => m.addTo(map));
-                    break;
-            }
-        }
-    });
-
-    document.getElementById('button-container').addEventListener('click', function(e) {
-        var btn = e.target.closest('button');
-        if (!btn) return;
-        if (btn.id === 'btn-prev') {
-            var newIndex = currentTarihIndex - 1;
-            if (newIndex < 1) newIndex = 15;
-            switchMap(newIndex);
-        }
-        if (btn.id === 'btn-next') {
-            var newIndex = currentTarihIndex + 1;
-            if (newIndex > 15) newIndex = 1;
-            switchMap(newIndex);
-        }
-    });
-
-    function initializeMapState() {
-        updateLayerControl('kıta');
-        switchMap(0);
-        kıtaMarkers.forEach(m => m.addTo(map));
-    }
-</script>
-
+            map.addLayer({
+                id: 'krallik-dolgu',
+                type: 'fill',
+                source: 'krallik-sinir',
+                paint: {
+                    'fill-color': '#FFD700',
+                    'fill-opacity': 0.15
+                }
+            });
+        });
+    </script>
 </body>
 </html>
