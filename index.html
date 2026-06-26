@@ -81,6 +81,34 @@
     </div>
 
     <script>
+        // 📌 LOKASYON VERİ TABANI
+        const locations = [
+            { id: "amun", title: "Büyük Kütüphane Amun", desc: "Dünyanın tüm bilgisinin toplandığı, Kafnaların merkez üssü olan devasa kütüphane şehri.", coords: [0, 4.5], color: "#FFD700" },
+            { id: "huwatan", title: "Huwatan Köyü", desc: "Theo'nun büyüdüğü, kitapların nadir bulunduğu ve Kafna Sedona ile ilk karşılaştığı küçük sınır köyü.", coords: [-25, -5.5], color: "#00FF00" },
+            { id: "kizil_sehir", title: "Kızıl Şehir (Kizil)", desc: "Kadim çağlarda büyük kütüphane savaşlarının ve stratejik kırılmaların yaşandığı tarihi askeri bölge.", coords: [12, 10.5], color: "#FF0000" },
+            { id: "kizil_dag", title: "Kızıl Dağ Sınırı", desc: "Mistik yaratıkların ve eski büyü kalıntılarının korunduğu, tekinsiz dağ silsilesi.", coords: [17, -9.5], color: "#FF4500" },
+            { id: "golge_ormani", title: "Kadim Gölge Ormanları", desc: "Farklı kabilelerin ve dış dünyaya kapalı toplulukların koruduğu gizli el yazmalarına ev sahipliği yapan orman.", coords: [-15, -13.5], color: "#00FF7F" }
+        ];
+
+        // 📜 SOL MENÜYÜ ANINDA DOLDUR (Haritadan bağımsız çalışır, boş kalmayı önler)
+        const catalogContainer = document.getElementById('catalog-list');
+        const markersMap = {}; 
+
+        locations.forEach(loc => {
+            const indexItem = document.createElement('div');
+            indexItem.className = 'index-item';
+            indexItem.innerHTML = `<strong>${loc.title}</strong><p>${loc.desc.substring(0, 65)}...</p>`;
+            
+            indexItem.addEventListener('click', () => {
+                if (window.mapReady && map) {
+                    map.flyTo({ center: loc.coords, zoom: 4.5, essential: true, speed: 1.2 });
+                    if (markersMap[loc.id]) markersMap[loc.id].togglePopup();
+                }
+            });
+            catalogContainer.appendChild(indexItem);
+        });
+
+        // 🗺️ HARİTA MOTORUNU BAŞLAT
         const map = new maplibregl.Map({
             container: 'map',
             renderWorldCopies: false, 
@@ -97,9 +125,106 @@
         });
 
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
+        window.mapReady = false;
 
-        const locations = [
-            { id: "amun", title: "Büyük Kütüphane Amun", desc: "Dünyanın tüm bilgisinin toplandığı, Kafnaların merkez üssü olan devasa kütüphane şehri.", coords: [0, 4.5], color: "#FFD700" },
-            { id: "huwatan", title: "Huwatan Köyü", desc: "Theo'nun büyüdüğü, kitapların nadir bulunduğu ve Kafna Sedona ile ilk karşılaştığı küçük sınır köyü.", coords: [-25, -5.5], color: "#00FF00" },
-            { id: "kizil_sehir", title: "Kızıl Şehir (Kizil)", desc: "Kadim çağlarda büyük kütüphane savaşlarının ve stratejik kırılmaların yaşandığı tarihi askeri bölge.", coords: [12, 10.5], color: "#FF0000" },
-            { id: "kizil_dag", title: "Kızıl Dağ Sınırı", desc: "Mistik yaratıkların ve eski büyü kalıntılarının korunduğu, te
+        map.on('load', function () {
+            window.mapReady = true;
+
+            // 1️⃣ TABAN KATMAN: MANGA HARİTASI
+            const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
+            map.addSource('image-source', {
+                type: 'image',
+                url: imageURL,
+                coordinates: [[-60, 31.39], [60, 31.39], [60, -31.39], [-60, -31.39]]
+            });
+            map.addLayer({
+                id: 'image-layer',
+                type: 'raster',
+                source: 'image-source',
+                paint: { 'raster-opacity': 0.95 }
+            });
+
+            // 2️⃣ İŞARETÇİLERİ VE POPUPLARI EKLE
+            locations.forEach(loc => {
+                const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`<h3>${loc.title}</h3><p>${loc.desc}</p>`);
+                const marker = new maplibregl.Marker({ color: loc.color }).setLngLat(loc.coords).setPopup(popup).addTo(map);
+                markersMap[loc.id] = marker; 
+            });
+
+            // 3️⃣ YOĞUN SİS DUVARI MOTORU (Kusursuzlaştırılmış URL Altyapısı)
+            const fogImage = new Image();
+            fogImage.crossOrigin = "anonymous"; 
+            // DÜZELTİLEN LINK: refs/heads/main yapısı eklendi, artık CORS engeline takılamaz!
+            fogImage.src = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sis1.webp'; 
+
+            fogImage.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 2400;  
+                canvas.height = 1200;
+                const ctx = canvas.getContext('2d');
+
+                const cloudList = [];
+                for (let x = 80; x < 1450; x += 130) {
+                    for (let y = 100; y < 1050; y += 110) {
+                        if (Math.random() > 0.15) {
+                            cloudList.push({
+                                x: x + (Math.random() - 0.5) * 90,
+                                y: y + (Math.random() - 0.5) * 90,
+                                scale: 0.35 + Math.random() * 0.35, 
+                                seed: Math.random() * 100,
+                                speedX: 0.3 + Math.random() * 0.4,
+                                speedY: 0.2 + Math.random() * 0.4
+                            });
+                        }
+                    }
+                }
+
+                map.addSource('dense-manga-fog-source', {
+                    type: 'canvas',
+                    canvas: canvas,
+                    coordinates: [[-63, 32], [63, 32], [63, -32], [-63, -32]], 
+                    animate: true
+                });
+
+                map.addLayer({
+                    id: 'dense-manga-fog-layer',
+                    type: 'raster',
+                    source: 'dense-manga-fog-source',
+                    paint: {
+                        'raster-opacity': 0.88, 
+                        'raster-fade-duration': 0
+                    }
+                });
+
+                let startTime = Date.now();
+
+                function renderDenseFog() {
+                    if (!map.getLayer('dense-manga-fog-layer')) return; 
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const elapsed = (Date.now() - startTime) / 1000;
+
+                    cloudList.forEach(c => {
+                        const xDrift = Math.sin(elapsed * c.speedX + c.seed) * 12;
+                        const yDrift = Math.cos(elapsed * c.speedY + c.seed) * 8;
+                        ctx.globalAlpha = 0.82 + Math.sin(elapsed * 0.5 + c.seed) * 0.12;
+
+                        const finalWidth = fogImage.width * c.scale;
+                        const finalHeight = fogImage.height * c.scale;
+
+                        ctx.drawImage(fogImage, c.x + xDrift, c.y + yDrift, finalWidth, finalHeight);
+                    });
+
+                    requestAnimationFrame(renderDenseFog);
+                }
+
+                renderDenseFog();
+            };
+
+            // Güvenlik önlemi: Ola ki bir gün internet yavaşlar veya resim silinirse harita donmasın
+            fogImage.onerror = function() {
+                console.log("Sis yüklenemedi ama harita ve menü güvenli modda çalışıyor.");
+            };
+        });
+    </script>
+</body>
+</html>
