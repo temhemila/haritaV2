@@ -107,7 +107,7 @@
         ];
 
         map.on('load', function () {
-            // 🗺️ TABAN KATMAN: MANGA HARİTASI (Arka Plan)
+            // 🗺️ TABAN KATMAN: MANGA HARİTASI
             const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
             map.addSource('image-source', {
                 type: 'image',
@@ -122,11 +122,11 @@
             });
 
             // ========================================================
-            // 💨 CANLI VE GERÇEKÇİ MANGA SİS MOTORU
+            // 💨 CANLI TEST SİS KATMANI (Şu an aktif!)
             // ========================================================
             
-            // Buraya haritayla birebir aynı boyutta kesilmiş, arkası şeffaf ve sadece sis çizimlerini barındıracak resmini bağlayacaksın
-            const fogURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sis.png'; 
+            // Test için internetten kesin çalışan, arkası şeffaf bir bulut görseli bağladım
+            const fogURL = 'https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_cloud.png'; 
 
             const baseCoords = [[-60, 31.39], [60, 31.39], [60, -31.39], [-60, -31.39]];
 
@@ -141,7 +141,7 @@
                 type: 'raster',
                 source: 'manga-fog-source',
                 paint: {
-                    'raster-opacity': 0.85,
+                    'raster-opacity': 0.40, // Test resmi yoğun olduğu için opasiteyi %40 yaptık
                     'raster-fade-duration': 0
                 }
             });
@@ -149,19 +149,17 @@
             let startTime = Date.now();
 
             function animateMangaFog() {
-                const elapsed = (Date.now() - startTime) / 1000; // Saniye bazında zaman
+                const elapsed = (Date.now() - startTime) / 1000; 
 
-                // 1. HAFİF NEFES ALMA EFEKTİ (Opasite Değişimi)
-                // Sis yavaşça kalınlaşıp incelir (0.75 ile 0.93 arası dalgalanır)
-                const opacity = 0.84 + Math.sin(elapsed * 1.2) * 0.09;
+                // 1. NEFES ALMA EFEKTİ (Yavaşça yoğunlaşıp açılma)
+                const opacity = 0.35 + Math.sin(elapsed * 0.8) * 0.12;
                 if (map.getLayer('manga-fog-layer')) {
                     map.setPaintProperty('manga-fog-layer', 'raster-opacity', opacity);
                 }
 
-                // 2. HAFİF YÜZME EFEKTİ (Mikro Koordinat Salınımı)
-                // Sis yerinden kopmaz ama havada asılı gibi minik minik titrer/salınır
-                const dx = Math.sin(elapsed * 0.7) * 0.15;
-                const dy = Math.cos(elapsed * 0.5) * 0.08;
+                // 2. YÜZME EFEKTİ (Havada asılı kalıp minikçe sallanma)
+                const dx = Math.sin(elapsed * 0.5) * 0.25;
+                const dy = Math.cos(elapsed * 0.4) * 0.15;
 
                 const newCoords = baseCoords.map(coord => [coord[0] + dx, coord[1] + dy]);
                 
@@ -173,7 +171,6 @@
                 requestAnimationFrame(animateMangaFog);
             }
             
-            // Animasyon döngüsünü başlat
             animateMangaFog();
 
             // 📌 İNDEKS VE İŞARETÇİLERİN BAĞLANMASI
