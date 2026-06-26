@@ -12,7 +12,6 @@
         body { margin: 0; padding: 0; background-color: #1e1e24; font-family: 'Georgia', serif; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; }
         
-        /* Üst Başlık Tasarımı */
         .map-title {
             position: absolute;
             top: 20px;
@@ -31,15 +30,8 @@
             pointer-events: none;
             text-align: center;
         }
-        .map-subtitle {
-            font-family: 'Georgia', serif;
-            font-size: 13px;
-            color: #c5a059;
-            margin-top: 4px;
-            letter-spacing: 1px;
-        }
+        .map-subtitle { font-family: 'Georgia', serif; font-size: 13px; color: #c5a059; margin-top: 4px; letter-spacing: 1px; }
 
-        /* 📜 KÜTÜPHANE KATALOĞU (YAN PANEL) TASARIMI */
         .sidebar {
             position: absolute;
             top: 130px;
@@ -53,78 +45,25 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.5);
             z-index: 10;
             overflow-y: auto;
-            border-left: 6px solid #5c401b; /* Kitap sırtı efekti */
+            border-left: 6px solid #5c401b;
         }
         .sidebar-title {
-            font-family: 'Cinzel', serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: #4a3319;
-            text-align: center;
-            border-bottom: 2px dashed #8c6d3b;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
+            font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: #4a3319;
+            text-align: center; border-bottom: 2px dashed #8c6d3b; padding-bottom: 10px; margin-bottom: 15px; letter-spacing: 1px;
         }
-        .index-item {
-            padding: 12px 8px;
-            border-bottom: 1px solid #e6dbcb;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #5a4531;
-        }
-        .index-item:hover {
-            background: #ebdcb9;
-            padding-left: 15px;
-            color: #8b0000;
-            border-radius: 4px;
-        }
-        .index-item strong {
-            font-family: 'Cinzel', serif;
-            display: block;
-            font-size: 13px;
-            margin-bottom: 3px;
-            color: #2b1a08;
-        }
-        .index-item p {
-            margin: 0;
-            font-size: 12px;
-            line-height: 1.4;
-            font-style: italic;
-        }
+        .index-item { padding: 12px 8px; border-bottom: 1px solid #e6dbcb; cursor: pointer; transition: all 0.3s ease; color: #5a4531; }
+        .index-item:hover { background: #ebdcb9; padding-left: 15px; color: #8b0000; border-radius: 4px; }
+        .index-item strong { font-family: 'Cinzel', serif; display: block; font-size: 13px; margin-bottom: 3px; color: #2b1a08; }
+        .index-item p { margin: 0; font-size: 12px; line-height: 1.4; font-style: italic; }
 
-        /* 🗺️ KADİM PARŞÖMEN POPUP TASARIMI (CSS OVERRIDES) */
         .maplibregl-popup-content {
-            background: #fbf6ee !important;
-            border: 2px solid #8c6d3b !important;
-            border-radius: 8px !important;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.4) !important;
-            padding: 15px !important;
-            color: #3d2b1f !important;
-            max-width: 260px;
+            background: #fbf6ee !important; border: 2px solid #8c6d3b !important; border-radius: 8px !important;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4) !important; padding: 15px !important; color: #3d2b1f !important; max-width: 260px;
         }
-        .maplibregl-popup-content h3 {
-            font-family: 'Cinzel', serif;
-            color: #8b2500;
-            margin: 0 0 8px 0;
-            font-size: 15px;
-            border-bottom: 1px dashed #8c6d3b;
-            padding-bottom: 5px;
-        }
-        .maplibregl-popup-content p {
-            margin: 0;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        .maplibregl-popup-close-button {
-            color: #8c6d3b !important;
-            font-size: 16px !important;
-            padding: 4px 8px !important;
-        }
-        .maplibregl-popup-tip {
-            border-top-color: #8c6d3b !important;
-            border-bottom-color: #8c6d3b !important;
-        }
+        .maplibregl-popup-content h3 { font-family: 'Cinzel', serif; color: #8b2500; margin: 0 0 8px 0; font-size: 15px; border-bottom: 1px dashed #8c6d3b; padding-bottom: 5px; }
+        .maplibregl-popup-content p { margin: 0; font-size: 13px; line-height: 1.5; }
+        .maplibregl-popup-close-button { color: #8c6d3b !important; font-size: 16px !important; padding: 4px 8px !important; }
+        .maplibregl-popup-tip { border-top-color: #8c6d3b !important; border-bottom-color: #8c6d3b !important; }
     </style>
 </head>
 <body>
@@ -150,11 +89,7 @@
                 version: 8,
                 sources: {},
                 layers: [
-                    {
-                        id: 'background',
-                        type: 'background',
-                        paint: { 'background-color': '#1a1410' } 
-                    }
+                    { id: 'background', type: 'background', paint: { 'background-color': '#1a1410' } }
                 ]
             },
             center: [0, 0],
@@ -163,59 +98,22 @@
 
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-        // 📌 MAGUS OF THE LIBRARY EVRENİ LOKASYON VERİ TABANI
         const locations = [
-            {
-                id: "amun",
-                title: "Büyük Kütüphane Amun",
-                desc: "Dünyanın tüm bilgisinin toplandığı, Kafnaların merkez üssü olan devasa kütüphane şehri.",
-                coords: [0, 4.5],
-                color: "#FFD700" // Altın Sarısı
-            },
-            {
-                id: "huwatan",
-                title: "Huwatan Köyü",
-                desc: "Theo'nun büyüdüğü, kitapların nadir bulunduğu ve Kafna Sedona ile ilk karşılaştığı küçük sınır köyü.",
-                coords: [-25, -5.5],
-                color: "#00FF00" // Yeşil
-            },
-            {
-                id: "kizil_sehir",
-                title: "Kızıl Şehir (Kizil)",
-                desc: "Kadim çağlarda büyük kütüphane savaşlarının ve stratejik kırılmaların yaşandığı tarihi askeri bölge.",
-                coords: [12, 10.5],
-                color: "#FF0000" // Kırmızı
-            },
-            {
-                id: "kizil_dag",
-                title: "Kızıl Dağ Sınırı",
-                desc: "Mistik yaratıkların ve eski büyü kalıntılarının korunduğu, tekinsiz dağ silsilesi.",
-                coords: [17, -9.5],
-                color: "#FF4500" // Turuncu
-            },
-            {
-                id: "golge_ormani",
-                title: "Kadim Gölge Ormanları",
-                desc: "Farklı kabilelerin ve dış dünyaya kapalı toplulukların koruduğu gizli el yazmalarına ev sahipliği yapan orman.",
-                coords: [-15, -13.5],
-                color: "#00FF7F" // Açık Yeşil
-            }
+            { id: "amun", title: "Büyük Kütüphane Amun", desc: "Dünyanın tüm bilgisinin toplandığı, Kafnaların merkez üssü olan devasa kütüphane şehri.", coords: [0, 4.5], color: "#FFD700" },
+            { id: "huwatan", title: "Huwatan Köyü", desc: "Theo'nun büyüdüğü, kitapların nadir bulunduğu ve Kafna Sedona ile ilk karşılaştığı küçük sınır köyü.", coords: [-25, -5.5], color: "#00FF00" },
+            { id: "kizil_sehir", title: "Kızıl Şehir (Kizil)", desc: "Kadim çağlarda büyük kütüphane savaşlarının ve stratejik kırılmaların yaşandığı tarihi askeri bölge.", coords: [12, 10.5], color: "#FF0000" },
+            { id: "kizil_dag", title: "Kızıl Dağ Sınırı", desc: "Mistik yaratıkların ve eski büyü kalıntılarının korunduğu, tekinsiz dağ silsilesi.", coords: [17, -9.5], color: "#FF4500" },
+            { id: "golge_ormani", title: "Kadim Gölge Ormanları", desc: "Farklı kabilelerin ve dış dünyaya kapalı toplulukların koruduğu gizli el yazmalarına ev sahipliği yapan orman.", coords: [-15, -13.5], color: "#00FF7F" }
         ];
 
         map.on('load', function () {
+            // 🗺️ TABAN KATMAN: MANGA HARİTASI
             const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
-
             map.addSource('image-source', {
                 type: 'image',
                 url: imageURL,
-                coordinates: [
-                    [-60, 31.39],  
-                    [60, 31.39],   
-                    [60, -31.39],  
-                    [-60, -31.39]  
-                ]
+                coordinates: [[-60, 31.39], [60, 31.39], [60, -31.39], [-60, -31.39]]
             });
-
             map.addLayer({
                 id: 'image-layer',
                 type: 'raster',
@@ -223,38 +121,113 @@
                 paint: { 'raster-opacity': 0.95 }
             });
 
+            // ========================================================
+            // 💨 PROSEDÜREL MANGA SİSİ VE KRİSTAL MOTORU (PURE JS)
+            // ========================================================
+            const canvas = document.createElement('canvas');
+            canvas.width = 2048;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
+            // Dinamik Bulut Kütleleri Oluşturma
+            const cloudGroups = [];
+            for (let i = 0; i < 18; i++) {
+                cloudGroups.push({
+                    x: Math.random() * canvas.width,
+                    y: 150 + Math.random() * (canvas.height - 300),
+                    speed: 0.15 + Math.random() * 0.25,
+                    // Her ana kütlenin etrafındaki overlapping yuvarlak pofuduklar
+                    puffs: Array.from({ length: 12 }, () => ({
+                        dx: (Math.random() - 0.5) * 160,
+                        dy: (Math.random() - 0.5) * 90,
+                        r: 40 + Math.random() * 55
+                    })),
+                    // Mangadaki o uçuşan meşhur kristaller (Tılsımlar)
+                    crystals: Array.from({ length: 3 }, () => ({
+                        dx: (Math.random() - 0.5) * 120,
+                        dy: (Math.random() - 0.5) * 80,
+                        size: 4 + Math.random() * 5
+                    }))
+                });
+            }
+
+            map.addSource('animated-fog-source', {
+                type: 'canvas',
+                canvas: canvas,
+                coordinates: [[-60, 31.39], [60, 31.39], [60, -31.39], [-60, -31.39]],
+                animate: true
+            });
+
+            map.addLayer({
+                id: 'animated-fog-layer',
+                type: 'raster',
+                source: 'animated-fog-source',
+                paint: { 
+                    'raster-opacity': 0.55, // Alttaki haritanın ne kadar görüneceği (%55 sis opasitesi)
+                    'raster-fade-duration': 0 
+                }
+            });
+
+            // Canlı Çizim ve Sürükleme Döngüsü
+            function drawProceduralFog() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                cloudGroups.forEach(group => {
+                    // Sisi sağa doğru kaydır
+                    group.x += group.speed;
+                    if (group.x > canvas.width + 200) {
+                        group.x = -200;
+                    }
+
+                    // 1. Pofuduk Manga Bulutlarının Çizimi
+                    ctx.fillStyle = "rgba(245, 238, 225, 0.85)"; // Manga kağıdı tonunda yarı şeffaf iç dolgu
+                    ctx.strokeStyle = "rgba(50, 40, 35, 0.45)";   // İnce mürekkep hat çizgisi
+                    ctx.lineWidth = 2;
+
+                    group.puffs.forEach(puff => {
+                        ctx.beginPath();
+                        ctx.arc(group.x + puff.dx, group.y + puff.dy, puff.r, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 2. Mangadaki Mistik Kristallerin (Tılsımların) Çizimi
+                    ctx.fillStyle = "rgba(40, 30, 25, 0.6)";
+                    group.crystals.forEach(cry => {
+                        const cx = group.x + cry.dx;
+                        const cy = group.y + cry.dy;
+                        const s = cry.size;
+
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy - s * 1.5); // Üst köşe
+                        ctx.lineTo(cx + s, cy);       // Sağ köşe
+                        ctx.lineTo(cx, cy + s * 1.5); // Alt köşe
+                        ctx.lineTo(cx - s, cy);       // Sol köşe
+                        ctx.closePath();
+                        ctx.fill();
+                    });
+                });
+
+                requestAnimationFrame(drawProceduralFog);
+            }
+
+            // Döngüyü Ateşle
+            drawProceduralFog();
+
+            // 📌 İNDEKS VE İŞARETÇİLERİN BAĞLANMASI
             const catalogContainer = document.getElementById('catalog-list');
-
-            // Listeyi döngüye alarak hem haritaya hem menüye dinamik ekliyoruz
             locations.forEach(loc => {
-                
-                // 1. Haritada Parşömen Popup Oluşturma
-                const popup = new maplibregl.Popup({ offset: 25 })
-                    .setHTML(`<h3>${loc.title}</h3><p>${loc.desc}</p>`);
+                const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`<h3>${loc.title}</h3><p>${loc.desc}</p>`);
+                const marker = new maplibregl.Marker({ color: loc.color }).setLngLat(loc.coords).setPopup(popup).addTo(map);
 
-                // 2. İşaretçiyi Haritaya Ekleme
-                const marker = new maplibregl.Marker({ color: loc.color })
-                    .setLngLat(loc.coords)
-                    .setPopup(popup)
-                    .addTo(map);
-
-                // 3. Sol Menüye (Sidebar) Eleman Ekleme
                 const indexItem = document.createElement('div');
                 indexItem.className = 'index-item';
                 indexItem.innerHTML = `<strong>${loc.title}</strong><p>${loc.desc.substring(0, 65)}...</p>`;
                 
-                // Menü elemanına tıklanınca haritayı oraya uçurma fonksiyonu
                 indexItem.addEventListener('click', () => {
-                    map.flyTo({
-                        center: loc.coords,
-                        zoom: 4.5,
-                        essential: true,
-                        speed: 1.2
-                    });
-                    // Pencereyi otomatik aç
+                    map.flyTo({ center: loc.coords, zoom: 4.5, essential: true, speed: 1.2 });
                     marker.togglePopup();
                 });
-
                 catalogContainer.appendChild(indexItem);
             });
         });
