@@ -107,7 +107,7 @@
         ];
 
         map.on('load', function () {
-            // 🗺️ TABAN KATMAN: MANGA HARİTASI
+            // 🗺️ TABAN KATMAN: MANGA HARİTASI (Arka Plan)
             const imageURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sigma.webp';
             map.addSource('image-source', {
                 type: 'image',
@@ -122,97 +122,59 @@
             });
 
             // ========================================================
-            // 💨 PROSEDÜREL MANGA SİSİ VE KRİSTAL MOTORU (PURE JS)
+            // 💨 CANLI VE GERÇEKÇİ MANGA SİS MOTORU
             // ========================================================
-            const canvas = document.createElement('canvas');
-            canvas.width = 2048;
-            canvas.height = 1024;
-            const ctx = canvas.getContext('2d');
+            
+            // Buraya haritayla birebir aynı boyutta kesilmiş, arkası şeffaf ve sadece sis çizimlerini barındıracak resmini bağlayacaksın
+            const fogURL = 'https://raw.githubusercontent.com/temhemila/haritaV2/refs/heads/main/resimler/sis.png'; 
 
-            // Dinamik Bulut Kütleleri Oluşturma
-            const cloudGroups = [];
-            for (let i = 0; i < 18; i++) {
-                cloudGroups.push({
-                    x: Math.random() * canvas.width,
-                    y: 150 + Math.random() * (canvas.height - 300),
-                    speed: 0.15 + Math.random() * 0.25,
-                    // Her ana kütlenin etrafındaki overlapping yuvarlak pofuduklar
-                    puffs: Array.from({ length: 12 }, () => ({
-                        dx: (Math.random() - 0.5) * 160,
-                        dy: (Math.random() - 0.5) * 90,
-                        r: 40 + Math.random() * 55
-                    })),
-                    // Mangadaki o uçuşan meşhur kristaller (Tılsımlar)
-                    crystals: Array.from({ length: 3 }, () => ({
-                        dx: (Math.random() - 0.5) * 120,
-                        dy: (Math.random() - 0.5) * 80,
-                        size: 4 + Math.random() * 5
-                    }))
-                });
-            }
+            const baseCoords = [[-60, 31.39], [60, 31.39], [60, -31.39], [-60, -31.39]];
 
-            map.addSource('animated-fog-source', {
-                type: 'canvas',
-                canvas: canvas,
-                coordinates: [[-60, 31.39], [60, 31.39], [60, -31.39], [-60, -31.39]],
-                animate: true
+            map.addSource('manga-fog-source', {
+                type: 'image',
+                url: fogURL,
+                coordinates: baseCoords
             });
 
             map.addLayer({
-                id: 'animated-fog-layer',
+                id: 'manga-fog-layer',
                 type: 'raster',
-                source: 'animated-fog-source',
-                paint: { 
-                    'raster-opacity': 0.55, // Alttaki haritanın ne kadar görüneceği (%55 sis opasitesi)
-                    'raster-fade-duration': 0 
+                source: 'manga-fog-source',
+                paint: {
+                    'raster-opacity': 0.85,
+                    'raster-fade-duration': 0
                 }
             });
 
-            // Canlı Çizim ve Sürükleme Döngüsü
-            function drawProceduralFog() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let startTime = Date.now();
 
-                cloudGroups.forEach(group => {
-                    // Sisi sağa doğru kaydır
-                    group.x += group.speed;
-                    if (group.x > canvas.width + 200) {
-                        group.x = -200;
-                    }
+            function animateMangaFog() {
+                const elapsed = (Date.now() - startTime) / 1000; // Saniye bazında zaman
 
-                    // 1. Pofuduk Manga Bulutlarının Çizimi
-                    ctx.fillStyle = "rgba(245, 238, 225, 0.85)"; // Manga kağıdı tonunda yarı şeffaf iç dolgu
-                    ctx.strokeStyle = "rgba(50, 40, 35, 0.45)";   // İnce mürekkep hat çizgisi
-                    ctx.lineWidth = 2;
+                // 1. HAFİF NEFES ALMA EFEKTİ (Opasite Değişimi)
+                // Sis yavaşça kalınlaşıp incelir (0.75 ile 0.93 arası dalgalanır)
+                const opacity = 0.84 + Math.sin(elapsed * 1.2) * 0.09;
+                if (map.getLayer('manga-fog-layer')) {
+                    map.setPaintProperty('manga-fog-layer', 'raster-opacity', opacity);
+                }
 
-                    group.puffs.forEach(puff => {
-                        ctx.beginPath();
-                        ctx.arc(group.x + puff.dx, group.y + puff.dy, puff.r, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.stroke();
-                    });
+                // 2. HAFİF YÜZME EFEKTİ (Mikro Koordinat Salınımı)
+                // Sis yerinden kopmaz ama havada asılı gibi minik minik titrer/salınır
+                const dx = Math.sin(elapsed * 0.7) * 0.15;
+                const dy = Math.cos(elapsed * 0.5) * 0.08;
 
-                    // 2. Mangadaki Mistik Kristallerin (Tılsımların) Çizimi
-                    ctx.fillStyle = "rgba(40, 30, 25, 0.6)";
-                    group.crystals.forEach(cry => {
-                        const cx = group.x + cry.dx;
-                        const cy = group.y + cry.dy;
-                        const s = cry.size;
+                const newCoords = baseCoords.map(coord => [coord[0] + dx, coord[1] + dy]);
+                
+                const source = map.getSource('manga-fog-source');
+                if (source) {
+                    source.setCoordinates(newCoords);
+                }
 
-                        ctx.beginPath();
-                        ctx.moveTo(cx, cy - s * 1.5); // Üst köşe
-                        ctx.lineTo(cx + s, cy);       // Sağ köşe
-                        ctx.lineTo(cx, cy + s * 1.5); // Alt köşe
-                        ctx.lineTo(cx - s, cy);       // Sol köşe
-                        ctx.closePath();
-                        ctx.fill();
-                    });
-                });
-
-                requestAnimationFrame(drawProceduralFog);
+                requestAnimationFrame(animateMangaFog);
             }
-
-            // Döngüyü Ateşle
-            drawProceduralFog();
+            
+            // Animasyon döngüsünü başlat
+            animateMangaFog();
 
             // 📌 İNDEKS VE İŞARETÇİLERİN BAĞLANMASI
             const catalogContainer = document.getElementById('catalog-list');
